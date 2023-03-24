@@ -115,12 +115,11 @@ def compute_score(tab, args):
     return [aupr_success, aupr_error, auroc, fpr_at_95tpr, ace_score]
 
 
-def print_result(name, split, res, writer, epoch, args):
+def print_result(name, split, res, epoch, args):
     """ Print and return the evaluation of the prediction
         name      -> str: name of the method
         split     -> str: either Train, Val or Test
         res       -> tensor: (uncertainty, prediction, labels), the prediction with the confidence score
-        writer    -> SummaryWriter: for tensorboard logs
         epoch     -> int: current epoch
         args      -> Argparse: global arguments
     return:
@@ -130,12 +129,8 @@ def print_result(name, split, res, writer, epoch, args):
     aupr_success, aupr_error, auroc, fpr_at_95tpr, ace = compute_score(res, args)
 
     s = "\r" + split + " " + name
-    s += ': Fpr_at_95tpr {:.1f}, Aupr sucess: {:.1f}, Aupr error: {:.1f}, Roc: {:.1f},  Ace {:.3f}'
+    s += ': FPR@95 {:.1f}, AuPR sucess: {:.1f}, AuPR error: {:.1f}, AuROC: {:.1f},  ACE {:.3f}'
     print(s.format(fpr_at_95tpr * 100, aupr_success * 100, aupr_error * 100, auroc * 100, ace))
-    writer.add_scalars('data/' + split + '_metric_' + name,
-                       {"Aupr sucess": aupr_success, "Aupr error": aupr_error,
-                        "Auroc": auroc, "fpr_at_95tpr": fpr_at_95tpr, "ace": ace},
-                       epoch)
 
-    results = {"auroc": auroc, "aupr": aupr_success, "fpr_at_95tpr": fpr_at_95tpr, "ace": ace, "ece": ece}
+    results = {"auroc": auroc * 100, "aupr": aupr_success * 100, "fpr_at_95tpr": fpr_at_95tpr * 100, "ace": ace, "ece": ece}
     return results

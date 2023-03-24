@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from torchvision.utils import make_grid
 
 
@@ -13,9 +14,9 @@ def plot(x, output_m, y, args, normalize=True):
         images -> Tensor: the images, the segmentation map and the Gt Segmentation """
     h, w = args.size
     _pred = torch.argmax(output_m, dim=1).cpu()
-    prediction = torch.FloatTensor([args.cmap[p.item()] for p in _pred[0].view(-1)])
+    prediction = torch.FloatTensor(np.array([args.cmap[p.item()] for p in _pred[0].view(-1)]))
     prediction = prediction.transpose(0, 1).view(3, h, w) / 255.
-    y_visu = torch.FloatTensor([args.cmap[p.item()] for p in y[0].view(-1)])
+    y_visu = torch.FloatTensor(np.array([args.cmap[p.item()] for p in y[0].view(-1)]))
     y_visu = y_visu.transpose(0, 1).view(3, h, w) / 255.
     x = (x - x.min()) / (x.max() - x.min())
     a = torch.cat((x[0].unsqueeze(0).cpu(), prediction.unsqueeze(0), y_visu.unsqueeze(0)), dim=0)

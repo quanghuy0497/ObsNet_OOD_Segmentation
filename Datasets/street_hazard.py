@@ -1,5 +1,6 @@
 import json
 import torch
+import numpy as np
 from PIL import Image
 
 from Datasets.seg_transfo import SegTransformCompose, ToTensor
@@ -8,7 +9,8 @@ from Datasets.seg_transfo import SegTransformCompose, ToTensor
 class StreetHazard(torch.utils.data.Dataset):
     """ Class to load the Streethazards dataset"""
 
-    color = [[  0,   0,   0],                  # unlabeled
+    colors = np.array([
+             [  0,   0,   0],                  # unlabeled
              [ 70,  70,  70],                  # building
              [190, 153, 153],                  # fence
              [250, 170, 160],                  # other
@@ -22,9 +24,10 @@ class StreetHazard(torch.utils.data.Dataset):
              [102, 102, 156],                  # wall
              [220, 220,   0],                  # traffic sign
              [ 60, 250, 240],                  # anomaly
-           ]
+            ])
 
-    cmap = dict(zip(range(len(color)), color))
+    cmap = dict(zip(range(len(colors)), colors))
+
 
     class_name = ["unlabeled", "building", "fence", "other", "pedestrian", "pole", "street line", "road",
                     "side walk", "vegetation", "vehicule", "wall", "trafic sign", "anomaly"]

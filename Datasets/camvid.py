@@ -10,20 +10,22 @@ from Datasets.seg_transfo import SegTransformCompose, ToTensor
 class CamVid(torch.utils.data.Dataset):
     """Class to load the CamVid Dataset"""
 
-    cmap = {
-        0: (128, 128, 128),  # sky
-        1: (128, 0, 0),      # building
-        2: (192, 192, 128),  # column_pole
-        3: (128, 64, 128),   # road
-        4: (0, 0, 192),      # sidewalk
-        5: (128, 128, 0),    # Tree
-        6: (192, 128, 128),  # SignSymbol
-        7: (64, 64, 128),    # Fence
-        8: (64, 0, 128),     # Car
-        9: (64, 64, 0),      # Pedestrian
-        10: (0, 128, 192),   # Bicyclist
-        11: (0, 0, 0),       # Void
-        12: (60, 250, 240)}  # Anomaly
+    colors = np.array([
+                [128, 128, 128],          # sky
+                [128,   0,   0],          # building
+                [192, 192, 128],          # column_pole
+                [128,  64, 128],          # road
+                [  0,   0, 192],          # sidewalk
+                [128, 128,   0],          # Tree
+                [192, 128, 128],          # SignSymbol
+                [ 64,  64, 128],          # Fence
+                [ 64,   0, 128],          # Car
+                [ 64,  64,   0],          # Pedestrian
+                [  0, 128, 192],          # Bicyclist
+                [  0,   0,   0],          # Void
+                [ 60, 250, 240]])         # Anomaly
+    
+    cmap = dict(zip(range(len(colors)), colors))
 
     class_name = ["Sky", "Building", "Pole", "Road", "Sidewalk", "Tree", "SignSymbol",
                   "Fence", "Car", "Pedestrain", "Bicyclist", "Void", "Anomaly"]

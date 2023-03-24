@@ -12,6 +12,7 @@ from Models.segnet import SegNet
 from Models.obsnet import Obsnet_Seg as ObsNet
 from Models.deeplab_v3plus import deeplab_v3plus
 from Models.road_anomaly_networks.deepv3 import DeepWV3Plus, DeepWV3Plus_Obsnet
+from configs import argsconfig
 
 
 def img2tensor(file, args):
@@ -97,97 +98,18 @@ def _inference(img, segnet, obsnet):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data",        type=str, default="", help="Type of dataset")
-    parser.add_argument("--model",       type=str, default="", help="Segnet|deeplabv3plus|road_anomaly")
-    parser.add_argument("--img_folder",  type=str, default="", help="path to image folder")
-    parser.add_argument("--segnet_file", type=str, default="", help="path to segnet")
-    parser.add_argument("--obsnet_file", type=str, default="", help="path to obsnet")
+    parser.add_argument("--data",            type=str,      default="",         help="Type of dataset")
+    parser.add_argument("--model",           type=str,      default="",         help="Segnet|deeplabv3plus|road_anomaly")
+    parser.add_argument("--img_folder",      type=str,      default="",         help="path to image folder")
+    parser.add_argument("--segnet_file",     type=str,      default="",         help="path to segnet")
+    parser.add_argument("--obsnet_file",     type=str,      default="",         help="path to obsnet")
+    parser.add_argument("--seed",            type=int,      default=4040,       help="seed, if -1 no seed is use")
     args = parser.parse_args()
 
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    args.one = torch.FloatTensor([1.]).to(args.device)
-    args.zero = torch.FloatTensor([0.]).to(args.device)
-
-    if args.data == "CamVid":
-        args.mean = [0.4108, 0.4240, 0.4316]
-        args.std = [0.3066, 0.3111, 0.3068]
-        args.h, args.w = [360, 480]
-        args.nclass = 12
-        args.colors = np.array([
-            [128, 128, 128],  # sky
-            [128, 0, 0],  # building
-            [192, 192, 128],  # column_pole
-            [128, 64, 128],  # road
-            [0, 0, 192],  # sidewalk
-            [128, 128, 0],  # Tree
-            [192, 128, 128],  # SignSymbol
-            [64, 64, 128],  # Fence
-            [64, 0, 128],  # Car
-            [64, 64, 0],  # Pedestrian
-            [0, 128, 192],  # Bicyclist
-            [0, 0, 0],  # Void
-        ])
-
-        args.stuff_classes = [8, 9, 10]
-
-    elif args.data == "BddAnomaly":
-        args.mean = [0.3698, 0.4145, 0.4247]
-        args.std = [0.2525, 0.2695, 0.2870]
-        args.h, args.w = [360, 640]  # Original size [720, 1280]
-        args.nclass = 19
-        args.colors = np.array([
-            [128, 64, 128],  # road
-            [244, 35, 232],  # sidewalk
-            [70, 70, 70],  # building
-            [102, 102, 156],  # wall
-            [190, 153, 153],  # fence
-            [153, 153, 153],  # pole
-            [250, 170, 30],  # traffic_light
-            [220, 220, 0],  # traffic_sign
-            [107, 142, 35],  # vegetation
-            [152, 251, 152],  # terrain
-            [0, 130, 180],  # sky
-            [220, 20, 60],  # person
-            [255, 0, 0],  # rider
-            [0, 0, 142],  # car
-            [0, 0, 70],  # truck
-            [0, 60, 100],  # bus
-            [0, 80, 100],  # train
-            [0, 0, 230],  # motorcycle
-            [119, 11, 32],  # bicycle
-            [0, 0, 0]])  # unlabelled
-        args.stuff_classes = [11, 12, 13, 14, 15, 16, 17, 18, 19]
-
-    elif args.data == "CityScapes":
-        args.h, args.w = [512, 1024]   # original size [1024, 2048]
-        args.mean = (0.485, 0.456, 0.406)
-        args.std = (0.229, 0.224, 0.225)
-        args.nclass = 19
-        args.colors = np.array([[128, 64, 128],                     # 0: road
-                                [244, 35, 232],                     # 1: sidewalk
-                                [70, 70, 70],                       # 2: building
-                                [102, 102, 156],                    # 3: wall
-                                [190, 153, 153],                    # 4: fence
-                                [153, 153, 153],                    # 5: pole
-                                [250, 170, 30],                     # 6: traffic_light
-                                [220, 220, 0],                      # 7: traffic_sign
-                                [107, 142, 35],                     # 8: vegetation
-                                [152, 251, 152],                    # 9: terrain
-                                [0, 130, 180],                      # 10: sky
-                                [220, 20, 60],                      # 11: person
-                                [255, 0, 0],                        # 12: rider
-                                [0, 0, 142],                        # 13: car
-                                [0, 0, 70],                         # 14: truck
-                                [0, 60, 100],                       # 15: bus
-                                [0, 80, 100],                       # 16: train
-                                [0, 0, 230],                        # 17: motorcycle
-                                [119, 11, 32],                      # 18: bicycle
-                                [0, 0, 0]])                         # 19: unlabelled
-
-        args.stuff_classes = [11, 12, 13, 14, 15, 16, 17, 18, 19]
-
-    else:
-        raise NameError("Data not known")
+    
+    args = argconfigs(args)
+    
 
     args.imgs = glob.glob(args.img_folder + "*")
     args.cmap = dict(zip(range(len(args.colors)), args.colors))

@@ -43,11 +43,11 @@ def entropy(pred, softmax=False):
 def monte_carlo_estimation(segnet, images, bsize, width, height, args):
     """ Compute the mean of T forward passes with dropout corresponding to MCDropout"""
     mc = torch.zeros((bsize, width * height, args.nclass)).to(args.device)
-    for t in range(args.T):
+    for t in range(args.t):
         output_m = segnet(images, mc_drop=True)[-1]
         output = torch.transpose(output_m.view(bsize, args.nclass, -1), 1, 2).contiguous()
         mc += torch.softmax(output, -1)
-    return mc / args.T
+    return mc / args.t
 
 
 def mcda_estimation(segnet, images, bsize, width, height, args):
@@ -70,11 +70,11 @@ def mcda_estimation(segnet, images, bsize, width, height, args):
     transfo = SegTransformCompose(AdjustGamma(0.3), AdjustSaturation(0.1), AdjustHue(0.03),
                                   AdjustBrightness(0.2), AdjustContrast(0.2))
     uncertainty = torch.zeros((bsize, width * height, args.nclass)).to(args.device)
-    for t in range(int(args.T / 2)):
+    for t in range(int(args.t / 2)):
         output_m = segnet(augmented_img(images, args.device, transfo))
         output = torch.transpose(output_m.view(bsize, args.nclass, -1), 1, 2).contiguous()
         uncertainty += torch.softmax(output, -1)
-    uncertainty /= (args.T / 2)
+    uncertainty /= (args.t / 2)
     return uncertainty
 
 
@@ -82,14 +82,14 @@ def gauss_estimation(segnet, images, bsize, width, height, args):
     """ Compute the mean of T forward passes with noise in the params corresponding to Gauss Pert """
     uncertainty = torch.zeros((bsize, width * height, args.nclass)).to(args.device)
     tmp_net = copy.deepcopy(segnet)
-    for t in range(int(args.T)):
+    for t in range(int(args.t)):
         tmp_net.module.load_state_dict(torch.load(args.segnet_file))
         for _, param in enumerate(tmp_net.module.parameters(), 1):
             param.add_(torch.randn(param.size(), device=args.device) * args.gauss_lambda)
         output_m = tmp_net(images, mc_drop=False)
         output = torch.transpose(output_m.view(bsize, args.nclass, -1), 1, 2).contiguous()
         uncertainty += torch.softmax(output, -1)
-    uncertainty /= args.T
+    uncertainty /= args.t
     return uncertainty
 
 
@@ -133,5 +133,5 @@ def odin_estimation(segnet, images, bsize, args):
 
     odin_logit = segnet(odin_images, mc_drop=False)                             # New pred on the attacked images
     odin_pred = transform_output(odin_logit, bsize, args.nclass).detach()
-    uncertainty = 1 - torch.softmax(odin_pred / args.Temp, -1).max(-1)[0]       # 1 - softmax with Temperature Scaling
+    uncertainty = 1 - torch.softmax(odin_pred / args.temp, -1).max(-1)[0]       # 1 - softmax with Temperature Scaling
     return uncertainty

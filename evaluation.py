@@ -1,5 +1,6 @@
 import random
 import torch
+import wandb
 from torchvision.utils import make_grid
 
 from Utils.affichage import draw, plot
@@ -8,14 +9,13 @@ from Utils.utils import monte_carlo_estimation, mcda_estimation, gauss_estimatio
 from Utils.metrics import print_result
 
 
-def evaluate(epoch, obsnet, segnet, loader, split, writer, args):
+def evaluate(epoch, obsnet, segnet, loader, split, args):
     """ Evaluate method contain in the arguments args.test_multi
         epoch  ->  int: current epoch
         split  ->  str: Test or Val
         loader ->  torch.DataLoader: the dataloader
         obsnet ->  torch.Module: the observer to test
         segnet ->  torch.module: the segnet pretrained and freeze
-        writer ->  SummaryWriter: for tensorboard log
         args   ->  Argparse: global parameters
     return:
         avg_loss     -> float: average loss on the dataset
@@ -57,7 +57,7 @@ def evaluate(epoch, obsnet, segnet, loader, split, writer, args):
                 res_sm = batch_res_sm.cpu() if i == 0 else torch.cat((res_sm, batch_res_sm.cpu()), dim=0)
 
             if "temp_scale" in args.test_multi:  # 1 minus the max of the temperated prediction
-                ts = 1 - torch.softmax(segnet_logit/args.Temp, -1).max(-1)[0]
+                ts = 1 - torch.softmax(segnet_logit/args.temp, -1).max(-1)[0]
                 batch_res_ts = torch.cat((ts.view(-1, 1), pred, target), dim=1)
                 res_ts = batch_res_ts.cpu() if i == 0 else torch.cat((res_ts, batch_res_ts.cpu()), dim=0)
 
@@ -113,33 +113,33 @@ def evaluate(epoch, obsnet, segnet, loader, split, writer, args):
                     uncertainty_map = torch.cat((obsnet_uncertainty, sm_uncertainty, label), dim=0)
                     uncertainty_map = make_grid(uncertainty_map, normalize=False)
 
-                    writer.add_image(split + "/segmentation_map",
-                                     plot(images, segnet_feat[-1], target.view(bsize, -1), args=args), epoch)
-                    writer.add_image(split + "/uncertainty_map", uncertainty_map, epoch)
+                    if args.wandb:
+                        seg_map = wandb.Image(plot(images, segnet_feat[-1], target.view(bsize, -1), args=args), caption='Segmentation Map')
+                        ood_map = wandb.Image(uncertainty_map, caption="Uncertainty map")
+                        wandb.log({split + "/Segmentation Map": seg_map, split + "/Uncertainty Map": ood_map}, step = epoch + 1)
 
         if "odin" in args.test_multi:                     # output of ODIN
             odin = odin_estimation(segnet, images, bsize, args)
             batch_res_odin = torch.cat((odin.view(-1, 1), pred, target), dim=1)
             res_odin = batch_res_odin.cpu() if i == 0 else torch.cat((res_odin, batch_res_odin.cpu()), dim=0)
 
-    if "mcp" in args.test_multi:        print_result("Softmax", split, res_sm, writer, epoch, args)
-    if "temp_scale" in args.test_multi: print_result("Temp scale", split, res_ts, writer, epoch, args)
-    if "void" in args.test_multi:       print_result("Void", split, res_void, writer, epoch, args)
-    if "mcda" in args.test_multi:       print_result("MCDA", split, res_mcda, writer, epoch, args)
-    if "gauss" in args.test_multi:      print_result("Gauss", split, res_gauss, writer, epoch, args)
-    if "ensemble" in args.test_multi:   print_result("Ensemble", split, res_ens, writer, epoch, args)
-    if "mc_drop" in args.test_multi:    print_result("MC Dropout", split, res_mc, writer, epoch, args)
-    if "odin" in args.test_multi:       print_result("Odin", split, res_odin, writer, epoch, args)
-    res_obs = print_result("ObsNet", "Val", res_obs, writer, epoch, args)
+    if "mcp" in args.test_multi:        print_result("Softmax", split, res_sm, epoch, args)
+    if "temp_scale" in args.test_multi: print_result("Temp scale", split, res_ts, epoch, args)
+    if "void" in args.test_multi:       print_result("Void", split, res_void, epoch, args)
+    if "mcda" in args.test_multi:       print_result("MCDA", split, res_mcda, epoch, args)
+    if "gauss" in args.test_multi:      print_result("Gauss", split, res_gauss, epoch, args)
+    if "ensemble" in args.test_multi:   print_result("Ensemble", split, res_ens, epoch, args)
+    if "mc_drop" in args.test_multi:    print_result("MC Dropout", split, res_mc, epoch, args)
+    if "odin" in args.test_multi:       print_result("Odin", split, res_odin, epoch, args)
+    res_obs = print_result("ObsNet", "Val", res_obs, epoch, args)
 
     avg_loss /= len(loader)
     obsnet_acc = 100 * (obsnet_acc / nb_sample)
     segnet_acc = 100 * (segnet_acc / nb_sample)
-    writer.add_scalars('data/' + split + 'Loss', {"loss": avg_loss}, epoch)
 
-    print(f"\rEpoch Summary: {split} Avg loss: {avg_loss:.4f}, "
+    print(f"\rEpoch {split} Summary: Avg loss: {avg_loss:.4f}, "
           f"ObsNet acc: {obsnet_acc:.2f}, "
           f"SegNet acc: {segnet_acc:.2f}\t"
           )
 
-    return [avg_loss, res_obs] if "obsnet" in args.test_multi else avg_loss
+    return [obsnet_acc, segnet_acc, avg_loss, res_obs] if "obsnet" in args.test_multi else avg_loss

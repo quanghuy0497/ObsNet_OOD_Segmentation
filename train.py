@@ -1,18 +1,18 @@
 import torch
+import wandb
 from torchvision.utils import make_grid
 from Utils.affichage import draw, plot
 from Utils.utils import transform_output
 from Utils.adv_attacks import select_attack
 
 
-def training(epoch, obsnet, segnet, train_loader, optimizer, writer, args):
+def training(epoch, obsnet, segnet, train_loader, optimizer, args):
     """ Train the observer network for one epoch
         epoch        ->  int: current epoch
         obsnet       ->  torch.Module: the observer to train
         segnet       ->  torch.Module: the segnet pretrained and freeze
         train_loader ->  torch.DataLoader: the training dataloader
         optimizer    ->  torch.optim: optimizer to train observer
-        writer       ->  SummaryWriter: for tensorboard log
         args         ->  Argparse: global parameters
     return:
         avg_loss -> float : average loss on the dataset
@@ -56,7 +56,6 @@ def training(epoch, obsnet, segnet, train_loader, optimizer, writer, args):
               f"Progress: {100*(i/len(train_loader)):.2f}%",
               end="")
 
-        writer.add_scalars('data/TrainLoss', {"loss": loss}, (epoch * len(train_loader)) + i)
 
         if i == 0:                                                                      # Visualization
             with torch.no_grad():
@@ -74,17 +73,19 @@ def training(epoch, obsnet, segnet, train_loader, optimizer, writer, args):
                 uncertainty_map = make_grid(uncertainty_map, normalize=False)
                 segmentation_map = plot(images + (10 * mask), segnet_feat[-1], target, args)
 
-            writer.add_image("Train/segmentation", segmentation_map, epoch)
-            writer.add_image("Train/uncertainty", uncertainty_map, epoch)
+            if args.wandb:
+                ood_map = wandb.Image(uncertainty_map, caption="Uncertainty map")
+                seg_map = wandb.Image(segmentation_map, caption="Segmentation map")
+                wandb.log({"Train/Segmentation Map": seg_map, "Train/Uncertainty Map": ood_map}, step = epoch + 1)
 
     avg_loss /= len(train_loader)
 
     obsnet_acc = 100 * (obsnet_acc / nb_sample)
     segnet_acc = 100 * (segnet_acc / nb_sample)
 
-    print(f"\rEpoch Summary: Train Avg loss: {avg_loss:.4f}, "
+    print(f"\rEpoch Train Summary: Train Avg loss: {avg_loss:.4f}, "
           f"ObsNet acc: {obsnet_acc:.2f}, "
           f"SegNet acc: {segnet_acc:.2f}"
           )
 
-    return avg_loss, obsnet_acc
+    return avg_loss, obsnet_acc, segnet_acc

@@ -31,16 +31,18 @@ def net_loader(args):
     else:
         raise NameError("Model not known")
 
-    segnet.load_state_dict(torch.load(args.segnet_file))
+    if not args.no_pretrained:      
+        #Temporary condition. The segnet_file is actually required training in prior
+        segnet.load_state_dict(torch.load(args.segnet_file))
     segnet.eval()
 
-    if args.test_only or args.resume:
+    if args.test or args.resume:
         obsnet.load_state_dict(torch.load(os.path.join(args.obsnet_file, "best.pth")))
 
-    if args.test_only:
+    if args.test:
         obsnet.eval()
 
-    if not args.test_only:
+    if not args.test:
         segnet = nn.DataParallel(segnet)
         obsnet = nn.DataParallel(obsnet)
 

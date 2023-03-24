@@ -1,0 +1,6 @@
+--2023-02-15 12:04:42--  https://bdd-data-storage-release.s3.us-west-2.amazonaws.com/bdd100k/2021/bdd100k_images_100k.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256
+Resolving bdd-data-storage-release.s3.us-west-2.amazonaws.com (bdd-data-storage-release.s3.us-west-2.amazonaws.com)... 52.218.218.81, 52.92.131.34, 52.218.222.25, ...
+Connecting to bdd-data-storage-release.s3.us-west-2.amazonaws.com (bdd-data-storage-release.s3.us-west-2.amazonaws.com)|52.218.218.81|:443... connected.
+HTTP request sent, awaiting response... 400 Bad Request
+2023-02-15 12:04:43 ERROR 400: Bad Request.
+

@@ -8,8 +8,8 @@ The original dataset consists of 7,000 training images and 1,000 validating imag
 
 ### Download guide:
 
-+ Download the 10k image set from [here](https://bdd-data.berkeley.edu/portal.html). Then store in `data/BddAnomaly/seg/images/`. Remove the `test` dir
-+ If necessery, download the annotate file and data processing code from [here](https://github.com/hendrycks/anomaly-seg), move it to `data/BddAnomaly`. But these part are already stored in this repo
++ Download the 10k image set from [here](https://bdd-data.berkeley.edu/portal.html). Then store in `Datasets/BddAnomaly/seg/images/`. Remove the `test` dir
++ If necessery, download the annotate file and data processing code from [here](https://github.com/hendrycks/anomaly-seg), move it to `Datasets/BddAnomaly`. But these part are already stored in this repo
 + Run `create_bdd_dataset.py` to obtain the `train/test/valiatiln.odgt`
 
 The folder structure should be:

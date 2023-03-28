@@ -25,15 +25,15 @@ def net_loader(args):
                                 pretrained_backbone=True, obsnet=True).to(args.device)
 
     elif args.model == "road_anomaly":
-        segnet = DeepWV3Plus(args.nclass).to(args.device)
+        segnet = DeepWVclear3Plus(args.nclass).to(args.device)
         obsnet = DeepWV3Plus_Obsnet(num_classes=1).to(args.device)
 
     else:
         raise NameError("Model not known")
 
-    if not args.no_pretrained:      
+    # if not args.no_pretrained:      
         #Temporary condition. The segnet_file is actually required training in prior
-        segnet.load_state_dict(torch.load(args.segnet_file))
+    segnet.load_state_dict(torch.load(args.segnet_file))
     segnet.eval()
 
     if args.test or args.resume:

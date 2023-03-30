@@ -1,0 +1,20 @@
+net_kwargs:
+  backbone: vit_tiny_patch16_384
+  d_model: 192
+  decoder:
+    drop_path_rate: 0.0
+    dropout: 0.1
+    n_cls: 0
+    n_layers: 2
+    name: mask_transformer
+  distilled: false
+  drop_path_rate: 0.1
+  dropout: 0.0
+  image_size: !!python/tuple
+  - 640
+  - 640
+  n_cls: 0
+  n_heads: 3
+  n_layers: 12
+  normalization: vit
+  patch_size: 16

@@ -1,8 +1,11 @@
 Datasets/StreetHazards/*
 !Datasets/StreetHazards/README.md
 Datasets/BddAnomaly/seg/images
-pre_trained/
-__pycache__
+
+pre_trained/*
+!pre_trained/Segmenter_*
 wandb/
-Models/Segmenter
+
+__pycache__
+
 ObsNet_Command.md

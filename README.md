@@ -5,11 +5,6 @@ In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV
 
 [Our paper](https://arxiv.org/abs/2108.01634)
 
-## TL;DR
-We present a new anomaly detection method for road semantic segmentation based on an observer network trained on the failure mode of the target network
-![Alt text](img/archi.png "Observer architecture")
-
-
 ## Abstract
 In this paper, we propose a new method, named Observer Network, for OOD and error detection for semantic segmentation. 
 We separate the segmentation and the error prediction by using a dedicated network to the later task, keeping the segmentation network unchanged.
@@ -174,9 +169,6 @@ Example:
 | Void Classifier           | :heavy_check_mark: |   36.61%      | 63.49%            |  21.14%          |  22.13%      | 6.49%            |
 | SynBoost                  | :heavy_check_mark: |   56.44%      | 61.86%            |  34.68%          |  17.81%      | 9.99%            |
 
-Sample of our results: 
-
-![Alt text](img/teaser_RA.gif)
 
 ## Pretrained Models
 

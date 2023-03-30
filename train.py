@@ -49,6 +49,7 @@ def training(epoch, obsnet, segnet, train_loader, optimizer, args):
         optimizer.step()
 
         avg_loss += loss.cpu().item()
+        
         segnet_acc += segnet_pred.max(-1)[1].view(-1).eq(target.view(-1)).sum()
         obsnet_acc += torch.round(torch.sigmoid(obs_pred)).view(-1).eq(supervision.view(-1)).sum()
 

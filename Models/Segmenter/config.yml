@@ -11,7 +11,7 @@ net_kwargs:
   drop_path_rate: 0.1
   dropout: 0.0
   image_size: !!python/tuple
-  - 640
+  - 320
   - 640
   n_cls: 0
   n_heads: 3

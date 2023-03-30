@@ -109,7 +109,7 @@ def argsconfig(args):
         args.stuff_classes = [11, 12, 13, 14, 15, 16, 17, 18, 19]
         
     elif args.data == "StreetHazards":
-        args.h, args.w = [640, 640]  # Original size [720, 1280]
+        args.h, args.w = [320, 640]  # Original size [720, 1280]
         args.mean = [0.485, 0.456, 0.406]
         args.std = [0.229, 0.224, 0.225]
         args.nclass = 14

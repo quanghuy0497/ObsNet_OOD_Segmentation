@@ -138,7 +138,7 @@ if __name__ == '__main__':
     date_id = "{:%Y%m%d@%H%M%S}".format(datetime.datetime.now())
     args.dset_folder = "Datasets/" + args.data + "/"
     if not args.test:
-        args.obsnet_file = "Checkpoint/" + args.data + "/" + date_id + "/"
+        args.obsnet_file = "logs/" + args.data + "_" + date_id + "/"
         os.mkdir(args.obsnet_file)
     
     if args.wandb:
@@ -149,7 +149,7 @@ if __name__ == '__main__':
             
         wandb.init(project="Observer Network - Triggering Failures for OOD Segmentation", name = wandb_name, config = args, id = date_id)
         
-    args.segnet_file = 'pre_trained/' +  args.segnet_file
+    args.segnet_file = 'segnet_file/' +  args.segnet_file
     
     #### Print Args ####
     pp = pprint.PrettyPrinter(indent=4)

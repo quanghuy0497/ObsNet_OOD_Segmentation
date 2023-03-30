@@ -2,8 +2,8 @@ Datasets/StreetHazards/*
 !Datasets/StreetHazards/README.md
 Datasets/BddAnomaly/seg/images
 
-pre_trained/*
-!pre_trained/Segmenter_*
+segnet_file/*
+!segnet_file/Segmenter_*
 wandb/
 
 __pycache__

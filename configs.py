@@ -109,7 +109,7 @@ def argsconfig(args):
         args.stuff_classes = [11, 12, 13, 14, 15, 16, 17, 18, 19]
         
     elif args.data == "StreetHazards":
-        args.h, args.w = [320, 640]  # Original size [720, 1280]
+        args.h, args.w = [320, 320]  # Original size [720, 1280]
         args.mean = [0.485, 0.456, 0.406]
         args.std = [0.229, 0.224, 0.225]
         args.nclass = 14
@@ -117,7 +117,7 @@ def argsconfig(args):
         args.crop = (80, 150)
         args.pos_weight = torch.tensor([3]).to(args.device)
         args.criterion = nn.BCEWithLogitsLoss(pos_weight=args.pos_weight)
-        args.patch_size = [300, 360, 160, 200]
+        args.patch_size = [300, 300, 160, 200]
         args.colors = np.array([[  0,   0,   0],        # unlabeled
                                 [ 70,  70,  70],        # building
                                 [190, 153, 153],        # fence

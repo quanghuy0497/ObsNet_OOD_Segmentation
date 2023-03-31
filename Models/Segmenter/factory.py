@@ -82,13 +82,14 @@ def create_segmenter(model_cfg, obsnet):
     return model
 
 
-def load_segmenter(num_classes, obsnet):
+def load_segmenter(num_classes, obsnet, img_size):
     config = os.path.join(os.getcwd(), "Models/Segmenter/config.yml")
     with open(config, "r") as f:
         variant = yaml.load(f, Loader=yaml.FullLoader)
     net_kwargs = variant["net_kwargs"]
     net_kwargs['n_cls'] = num_classes
     net_kwargs['decoder']['n_cls'] = num_classes
+    net_kwargs['image_size'] = img_size
     model = create_segmenter(net_kwargs, obsnet)
     
     return model

@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import pdb
 import torch.nn.functional as F
 
 from .utils import padding, unpadding
@@ -35,8 +36,8 @@ class Segmenter(nn.Module):
             return set(map(lambda x: prefix + x, module.no_weight_decay()))
 
         nwd_params = append_prefix_no_weight_decay("encoder.", self.encoder).union(
-            append_prefix_no_weight_decay("decoder.", self.decoder)
-        )
+            append_prefix_no_weight_decay("decoder.", self.decoder))
+        
         return nwd_params
     
     def forward(self, *args, **kwargs):

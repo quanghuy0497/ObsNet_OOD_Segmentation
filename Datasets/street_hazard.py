@@ -50,5 +50,4 @@ class StreetHazard(torch.utils.data.Dataset):
         imgx = Image.open(filex).convert('RGB')
         imgy = Image.open(filey)
         imgx, imgy = self.transforms(imgx, imgy)
-        imgy -= 1                                   # shift label from 1-15 to 0-14
         return imgx, imgy

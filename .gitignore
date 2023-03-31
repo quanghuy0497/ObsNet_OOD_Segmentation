@@ -2,9 +2,13 @@ Datasets/StreetHazards/*
 !Datasets/StreetHazards/README.md
 Datasets/BddAnomaly/seg/images
 
+obsnet_file/
 segnet_file/*
 !segnet_file/Segmenter_*
+
+logs/*
 wandb/
+tmp_code/
 
 __pycache__
 

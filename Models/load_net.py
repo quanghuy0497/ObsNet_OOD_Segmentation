@@ -30,16 +30,16 @@ def net_loader(args):
         obsnet = DeepWV3Plus_Obsnet(num_classes=1).to(args.device)
     
     elif args.model == "segmenter":
-        segnet = load_segmenter(num_classes = args.nclass, obsnet=False).to(args.device)
-        obsnet = load_segmenter(num_classes = args.nclass, obsnet=True).to(args.device)
+        segnet = load_segmenter(num_classes = args.nclass, obsnet=False, img_size = args.size).to(args.device)
+        obsnet = load_segmenter(num_classes = 1, obsnet=True, img_size = args.size).to(args.device)
 
     else:
         raise NameError("Model not known")
 
-    # if args.model == "segmenter":
-    #     segnet.load_state_dict(torch.load(args.segnet_file)['model'], strict=True)
-    # else:
-    #     segnet.load_state_dict(torch.load(args.segnet_file))
+    if args.model == "segmenter":
+        segnet.load_state_dict(torch.load(args.segnet_file)['model'], strict=True)
+    else:
+        segnet.load_state_dict(torch.load(args.segnet_file))
         
     segnet.eval()
 

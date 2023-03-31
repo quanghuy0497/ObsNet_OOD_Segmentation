@@ -1,5 +1,6 @@
 import torch
 import wandb
+import pdb
 from torchvision.utils import make_grid
 from Utils.affichage import draw, plot
 from Utils.utils import transform_output
@@ -33,16 +34,15 @@ def training(epoch, obsnet, segnet, train_loader, optimizer, args):
         with torch.no_grad():
             segnet_feat = segnet(images, return_feat=True)                                 # SegNet forward
             segnet_pred = transform_output(pred=segnet_feat[-1], bsize=bsize, nclass=args.nclass)
-
-            error = segnet_pred.max(-1)[1].view(-1) != target.view(-1)               # GT for observer training
-            # attack = mask.sum(1).reshape(-1) != 0
-            # supervision = error + attack
-            supervision = torch.where(error, args.one, args.zero).to(args.device)
+            segnet_pred = torch.argmax(segnet_pred, axis = 1).view(-1)
+            
+            error = segnet_pred != target.view(-1)             # GT for observer training
+            supervision = torch.where(error, args.one, args.zero).to(args.device).view(-1)
 
         obs_pred = obsnet(images, segnet_feat, no_residual=args.no_residual, no_img=args.no_img)
         obs_pred = transform_output(pred=obs_pred, bsize=bsize, nclass=1)
 
-        loss = args.criterion(obs_pred.view(-1), supervision.view(-1))
+        loss = args.criterion(obs_pred.view(-1), supervision)
 
         optimizer.zero_grad()
         loss.backward()
@@ -50,13 +50,12 @@ def training(epoch, obsnet, segnet, train_loader, optimizer, args):
 
         avg_loss += loss.cpu().item()
         
-        segnet_acc += segnet_pred.max(-1)[1].view(-1).eq(target.view(-1)).sum()
-        obsnet_acc += torch.round(torch.sigmoid(obs_pred)).view(-1).eq(supervision.view(-1)).sum()
+        segnet_acc += torch.sum(segnet_pred == target.view(-1))
+        obsnet_acc += torch.sum(torch.round(torch.sigmoid(obs_pred)).view(-1) == supervision)
 
         print(f"\rTrain loss: {loss.cpu().item():.4f}, "
               f"Progress: {100*(i/len(train_loader)):.2f}%",
               end="")
-
 
         if i == 0:                                                                      # Visualization
             with torch.no_grad():

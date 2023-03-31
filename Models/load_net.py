@@ -31,7 +31,7 @@ def net_loader(args):
     
     elif args.model == "segmenter":
         segnet = load_segmenter(num_classes = args.nclass, obsnet=False, img_size = args.size).to(args.device)
-        obsnet = load_segmenter(num_classes = 1, obsnet=True, img_size = args.size).to(args.device)
+        obsnet = load_segmenter(num_classes = args.nclass, obsnet=True, img_size = args.size).to(args.device)
 
     else:
         raise NameError("Model not known")

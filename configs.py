@@ -19,7 +19,7 @@ def argsconfig(args):
     if args.data == "CamVid":
         args.mean = [0.4108, 0.4240, 0.4316]
         args.std = [0.3066, 0.3111, 0.3068]
-        args.h, args.w = [360, 480]
+        args.h, args.w = [480, 480]
         args.size = [args.h, args.w]
         args.crop = (50, 80)
         args.pos_weight = torch.tensor([2]).to(args.device)
@@ -42,7 +42,7 @@ def argsconfig(args):
         args.stuff_classes = [8, 9, 10]
 
     elif args.data == "BddAnomaly":
-        args.h, args.w = [360, 640]  # Original size [720, 1280]
+        args.h, args.w = [640, 640]  # Original size [720, 1280]
         args.size = [args.h, args.w] 
         args.crop = (80, 150)
         args.pos_weight = torch.tensor([3]).to(args.device)
@@ -75,7 +75,7 @@ def argsconfig(args):
         args.stuff_classes = [11, 12, 13, 14, 15, 16, 17, 18, 19]
 
     elif args.data == "CityScapes":
-        args.h, args.w = [512, 1024]   # original size [1024, 2048]
+        args.h, args.w = [512, 512]   # original size [1024, 2048]
         args.size = [args.h, args.w]
         args.crop = (150, 250)
         args.pos_weight = torch.tensor([3]).to(args.device)
@@ -109,7 +109,7 @@ def argsconfig(args):
         args.stuff_classes = [11, 12, 13, 14, 15, 16, 17, 18, 19]
         
     elif args.data == "StreetHazards":
-        args.h, args.w = [320, 320]  # Original size [720, 1280]
+        args.h, args.w = [640, 640]  # Original size [720, 1280]
         args.mean = [0.485, 0.456, 0.406]
         args.std = [0.229, 0.224, 0.225]
         args.nclass = 14
@@ -117,8 +117,9 @@ def argsconfig(args):
         args.crop = (80, 150)
         args.pos_weight = torch.tensor([3]).to(args.device)
         args.criterion = nn.BCEWithLogitsLoss(pos_weight=args.pos_weight)
-        args.patch_size = [300, 300, 160, 200]
-        args.colors = np.array([[  0,   0,   0],        # unlabeled
+        args.patch_size = [300, 300, 160, 200] 
+        args.colors = np.array([[225, 225, 225],
+                                [  0,   0,   0],        # unlabeled
                                 [ 70,  70,  70],        # building
                                 [190, 153, 153],        # fence
                                 [250, 170, 160],        # other
@@ -133,7 +134,7 @@ def argsconfig(args):
                                 [220, 220,   0],        # traffic sign
                                 [ 60, 250, 240]])       # anomaly
                                 
-        args.stuff_classes = [13]
+        args.stuff_classes = [14]
 
     else:
         raise NameError("Data not known")

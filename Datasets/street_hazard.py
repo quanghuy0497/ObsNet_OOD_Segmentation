@@ -10,6 +10,7 @@ class StreetHazard(torch.utils.data.Dataset):
     """ Class to load the Streethazards dataset"""
 
     colors = np.array([
+             [225, 225, 225],
              [  0,   0,   0],                  # unlabeled
              [ 70,  70,  70],                  # building
              [190, 153, 153],                  # fence

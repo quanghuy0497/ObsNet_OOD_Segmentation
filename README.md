@@ -5,11 +5,14 @@ In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV
 
 [Our paper](https://arxiv.org/abs/2108.01634)
 
-## Abstract
-In this paper, we propose a new method, named Observer Network, for OOD and error detection for semantic segmentation. 
-We separate the segmentation and the error prediction by using a dedicated network to the later task, keeping the segmentation network unchanged.
-We trigger failures of the Segmentation Network by applying Local Adversarial Attacks (LAA) on the input image during training. These images serve as proxy OOD to train the observer.  
-We show that our method is fast, accurate and memory efficient on three different datasets and compare against multiple baselines.
+## Improvement from the [original repository](https://github.com/valeoai/obsnet)
+
+- [x] More details instructions for preparing datasets
+- [x] [Segmenter](https://arxiv.org/abs/2105.05633) (ViT-based) as model
+- [x] Training support for Segmentation Network with detailed instructions
+- [x] Better code management for both SegNet and ObsNet training/testing 
+- [x] Logging, tracking, and visualizing experiments with [WandB](https://wandb.ai/) (better than Tensorboard for sure 😉)
+
 
 ##  Repository Structure
     ├ Obsnet/

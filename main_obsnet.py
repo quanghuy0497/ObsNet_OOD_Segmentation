@@ -151,7 +151,7 @@ if __name__ == '__main__':
         else:
             wandb_name = date_id + "-" + args.data + "-" + args.model  + "-" + args.adv + "-" + args.segnet_file
             
-        wandb.init(project="Observer Network - Triggering Failures for OOD Segmentation", name = wandb_name, config = args, id = date_id)
+        wandb.init(project="Observer Network - ObsNet", name = wandb_name, config = args, id = date_id)
         
     args.segnet_file = 'segnet_file/' +  args.segnet_file
     

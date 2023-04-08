@@ -102,6 +102,6 @@ def train(epoch, segnet, train_loader, optimizer, args):
     segnet_acc = 100 * (segnet_acc / nb_sample)
 
     print(f"\rEpoch Train Summary: Train loss: {avg_loss:.4f}, "
-          f"Segnet Acc: {segnet_acc:.2f}")
+          f"SegNet Acc: {segnet_acc:.2f}")
 
     return avg_loss, segnet_acc

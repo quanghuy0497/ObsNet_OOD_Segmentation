@@ -142,6 +142,8 @@ if __name__ == '__main__':
     if not args.test:
         args.obsnet_file = "logs/obsnet_" + args.data +  "_" + args.model + "_" + date_id + "/"
         os.mkdir(args.obsnet_file)
+    else:
+        args.obsnet_file = "obsnet_file/" + args.obsnet_file
     # date_id = "20230401@230445"
     if args.wandb:
         if args.no_pretrained:

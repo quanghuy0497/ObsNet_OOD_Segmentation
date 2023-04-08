@@ -15,6 +15,7 @@ We show that our method is fast, accurate and memory efficient on three differen
     ├ Obsnet/
     |    ├── Models/                                <- networks
     |    |      ├── road_anomaly_networks/          <- networks from SegmentMeIfYouCan
+    |    |      ├── Segmenter/                      <- networks from Segmenter
     |    |      ├── load_net.py
     |    |      ├── deeplab_v3plus.py
     |    |      ├── resnet.py
@@ -22,29 +23,32 @@ We show that our method is fast, accurate and memory efficient on three differen
     |    |      └── segnet.py  
     |    |    
     |    ├── Dataset/                               <- loading  data
-    |    |      ├── BDD_anomaly.py                  <- BDDAnomaly dataset     
-    |    |      ├── camvid.py                       <- CamVid dataset     
-    |    |      ├── cityscapes.py                   <- CityScapes dataset     
-    |    |      ├── woodscapes.py                   <- WoodScape dataset     
-    |    |      ├── cea.py                          <- CEA dataset     
-    |    |      ├── load_data.py                    <- dataloader   
-    |    |      ├── seg_transfo.py                  <- adapt pytorch data augmentation for segmentation     
-    |    |      └── street_hazard.py                <- StreetHazards Dataset 
+    |    |      ├── BddAnomaly/                     <- BDDAnomaly dataset
+    |    |      ├── CamVid/                         <- CamVid dataset
+    |    |      ├── StreetHazards/                  <- StreedHazards dataset
+    |    |      ├── BDD_anomaly.py                  <- Dataset processing for BDD     
+    |    |      ├── camvid.py                       <- Dataset Processing for CamVid     
+    |    |      ├── cityscapes.py                   <- Dataset Processing for CityScapes     
+    |    |      ├── load_data.py                    <- Dataloader   
+    |    |      ├── seg_transfo.py                  <- Data augmentation for segmentation     
+    |    |      └── street_hazard.py                <- Dataset Processing for StreetHazards  
     |    |
     |    ├── Utils/                                 <- useful fct
     |    |      ├── adv_attack.py                   <- fct adversarial attacks      
-    |    |      ├── affichage.py                    <- fct for plot viridis & segmentation map       
+    |    |      ├── affichage.py                    <- fct for plot viridis & segment map       
     |    |      ├── loss.py                         <- focal loss      
     |    |      ├── metrics.py                      <- metrics for evaluation     
     |    |      └── utils.py                        <- useful functions
-    |    ├── Checkpoint/                                  <- models Checkpoint
-    |    ├── logs/                                  <- tensorboard logs
-    |    ├── img/                                   <- img for Teaser
-    |    ├── train.py                               <- training the observer
-    |    ├── evaluation.py                          <- test and evaluation
+    |    ├── logs/                                  <- trained logs
+    |    ├── obsnet_file/                           <- store pre-trained ObsNet models
+    |    ├── segnet_file/                           <- store pre-trained SegNet models
+    |    ├── configs.py                             <- Dataset params configs
+    |    ├── engine_obsnet.py                       <- Training and evaluation code for obsnet
+    |    ├── engine_segnet.py                       <- Training and evaluation code for segnet
+    |    ├── main_obsnet.py                         <- Main code for obsnet
+    |    ├── main_segnet.py                         <- Main code for segnet
     |    ├── inference.py                           <- perform inference on custom images
-    |    ├── README.md                              <- me :) 
-    |    └── main.py                                <- main
+    |    ├── README.md                              <- me :)
 
 ## Usage
     
@@ -83,14 +87,6 @@ Folder Structure:
     |    ├ train.txt
     |    └ val.txt
 
-To train an ObsNet on CamVid:
-
-    python main.py --dset_folder "<path to dataset>" --segnet_file "<path to pretrain segnet>" --obsnet_file "./Checkpoint/camvid/" --data "CamVid" --tboard "./logs/camvid" --num_workers <nb workers> --bsize 8 --adv "min_random_patch" --epsilon 0.025 --lr 0.2 --nclass 12
-     
-To test:
-    
-    python main.py --dset_folder "<path to dataset>" --segnet_file "<path to pretrain segnet>" --obsnet_file "./Checkpoint/camvid/" --data "CamVid" --tboard "./logs/camvid" --num_workers <nb workers> --nclass 12 --test --test_multi "obsnet,mcp,mc_dropout" 
-
 ### StreetHazards
 Dataset can be download here: https://github.com/hendrycks/anomaly-seg
 
@@ -110,14 +106,6 @@ Folder Structure:
     |    ├ train.odgt
     |    └ validation.odgt
 
-To train an ObsNet on Streethazards:
-
-    python main.py --dset_folder "<path to dataset>" --segnet_file "<path to pretrain segnet>" --obsnet_file "./Checkpoint/streethazards/" --data "StreetHazard" --tboard "./logs/streethazards" --num_workers <nb workers> --bsize 6 --adv "max_random_patch" --epsilon 0.001 --lr 0.02 --nclass 14
-
-To test:
-    
-    python main.py --dset_folder "<path to dataset>" --segnet_file "<path to pretrain segnet>" --obsnet_file "./Checkpoint/streethazards/" --data "StreetHazard" --tboard "./logs/bdd" --num_workers <nb workers> --nclass 14 --test --test_multi "obsnet,mcp,mc_dropout" 
-
 ### BDD Anomaly
 Dataset can be download here: https://github.com/hendrycks/anomaly-seg
 
@@ -133,15 +121,43 @@ Folder Structure:
     |    ├ train.odgt
     |    └ valiadation.odgt
 
-To train an ObsNet on BDD Anomaly:    
-    
-    python main.py --dset_folder "<path to dataset>" --segnet_file "<path to pretrain segnet>" --obsnet_file "./Checkpoint/bdd/" --data "BddAnomaly" --tboard "./logs/bdd" --num_workers <nb workers> --bsize 6 --adv "max_random_patch" --epsilon 0.001 --lr 0.02 --nclass 19
-    
-To test:
-    
-    python main.py --dset_folder "<path to dataset>" --segnet_file "<path to pretrain segnet>" --obsnet_file "./Checkpoint/bdd/" --data "BddAnomaly" --tboard "./logs/bdd" --num_workers <nb workers> --nclass 19 --test --test_multi "obsnet,mcp,mc_dropout" 
-        
-## Inference 
+## Training/Testing
+According to the paper, the SegNet must be trained in prior to obtain the weight model. Then, the trained (SegNet) model is then freezed (as pre-trained model) feeding to Obsnet to training the OOD segmentation alone.
+
+Unlike the original repository, we provide both SegNet and ObsNet training scheme, supporting CNN-based architectures (SegNet, DeepLabV3+) and ViT-based architecture (Segmenter). The first thing to do is training SegNet model first, then using its trained weight model for training ObsNet
+
+### SegNet
+
++ Training:
+    ```
+    python main_segnet.py --dataset <dataset name> --model <model name> --wandb <this flag is optional>
+    ```
+    + The segnet trained weight model is automatically generated in `logs/segnet_<dataset_name>_<model_name>_<datetime>`, for example: `segnet_StreetHazards_segnet_20230408@083545`
+
++ Testing is not support for this scheme (currently), due to the presence of OOD categories in test set.
+
++ After training, please move the SegNet trained model, (i.e, `best.pth`) to folder `segnet_file\` for ObsNet training
+
+### ObsNet
+
++ Training (including testing in the end):
+
+    ```
+      python main.py --model <model name> --data <dataset name> --adv <type of adversarial attack> --segnet_file <segnet_file name> --no_pretrained <optional> --wandb <optional>
+    ```
+    + `--no_pretrained`: Initialize the weight of the observer network with those of the segnet
+          model
+    + `--wandb`: log in WandB server
+    + The obsnet trained weight model is automatically generated in `logs/obsnet_<dataset_name>_<model_name>_<datetime>`, for example: `obsnet_StreetHazards_segnet_20230408@083545`
+    + After training, please move the ObsNet trained model to folder `obsnet_file\`
+
++ Testing only:
+    ```
+      python main.py --model <model name> --data <dataset name> --adv <type of adversarial attack> --segnet_file <segnet_file name> --obsnet_file <obsnet_file name> --test
+    ```
+    + Require both `--segnet_file` and `--obsnet_file` to have the model file name. By default, the 2 models is automatically selected in `segnet_file/` and `obsnet_file/`
+
+### Inference 
 
 You can perfom inference on a batch of images. 
 
@@ -149,30 +165,9 @@ Example:
 
     python inference.py --img_folder "<path to image folder>" --segnet_file "path to segnet" --obsnet_file "path to obsnet" --data "CityScapes" --model "raod_anomaly"    
 
-## Road Anomaly Segmentation (SegmentMeIfYouCan)
+## Pretrained ObsNet Models
 
-| Model name                | Train w/ OoD       |  AUPR (&uarr;)  |  FPR95TPR (&darr;)  |  sIoU gt (&uarr;)  |  PPV (&uarr;)  |  mean F1 (&uarr;)  |
-| --------------------------|:-----------------: | :-------------: | :-----------------: | :----------------: | :------------: | :----------------: |
-| **ObsNet (OURS)**         |        :x:         |   **75.44%**  | 26.69%            |  **44.22%**      | **52.56%**   | **45.08%**       |
-| NFlowJS                   |        :x:         |   56.92%      | 34.71%            |  36.94%          |  18.01%      | 14.89%           |
-| JSRNet                    |        :x:         |   33.64%      | 43.85%            |  20.20%          |  29.27%      | 13.66%           |
-| Image Resynthesis         |        :x:         |   52.28%      | **25.93%**        |  39.68%          |  10.95%      | 12.51%           |
-| Embedding Density         |        :x:         |   37.52%      | 70.76%            |  33.86%          |  20.54%      | 7.90%            |
-| Maximum Softmax           |        :x:         |   27.97%      | 72.05%            |  15.48%          |  15.29%      | 5.37%            |
-| ODIN                      |        :x:         |   33.06%      | 71.68%            |  19.53%          |  17.88%      | 5.15%            |
-| MC Dropout                |        :x:         |   28.87%      | 69.47%            |  20.49%          |  17.26%      | 4.26%            |
-| Ensemble                  |        :x:         |   17.66%      | 91.06%            |  16.44%          |  20.77%      | 3.39%            |
-| Mahalanobis               |        :x:         |   20.04%      | 86.99%            |  14.82%          |  10.22%      | 2.68%            |
-| | | | | | | |
-| DenseHybrid               | :heavy_check_mark: |   77.96%      |  9.81%            |  54.17%          |  24.13%      | 31.08%           |
-| Maximized Entropy         | :heavy_check_mark: |   85.47%      | 15.00%            |  49.21%          |  39.51%      | 28.72%           |
-| Void Classifier           | :heavy_check_mark: |   36.61%      | 63.49%            |  21.14%          |  22.13%      | 6.49%            |
-| SynBoost                  | :heavy_check_mark: |   56.44%      | 61.86%            |  34.68%          |  17.81%      | 9.99%            |
-
-
-## Pretrained Models
-
-Pretrained model are available in this [google drive](https://drive.google.com/drive/folders/11S9oK-Bk9PoP2728ldrROQKAa8Q3iUxx?usp=sharing)
+Pretrained model for ObsNet are available in this [google drive](https://drive.google.com/drive/folders/11S9oK-Bk9PoP2728ldrROQKAa8Q3iUxx?usp=sharing). Please save on `obsnet_file/`
 
 ## Citation
 If you find this repository usefull, please consider citing our [paper](https://arxiv.org/abs/2108.01634):

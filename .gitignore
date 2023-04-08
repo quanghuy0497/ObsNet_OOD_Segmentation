@@ -2,7 +2,8 @@ Datasets/StreetHazards/*
 !Datasets/StreetHazards/README.md
 Datasets/BddAnomaly/seg/images
 
-obsnet_file/
+obsnet_file/*
+!obsnet_file/Segmenter_*
 segnet_file/*
 !segnet_file/Segmenter_*
 

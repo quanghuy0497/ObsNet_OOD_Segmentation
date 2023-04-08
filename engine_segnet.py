@@ -54,10 +54,10 @@ def evaluate(epoch, segnet, loader, split, metric, args):
     Class_Avg = round(metric.value()[2] * 100, 4)
     IoU = metric.value()[1] * 100
 
-    print(f"\rEpoch {split} Summary: Avg loss: {Loss:.4f}, "
-          f"Global Acc: {Global_Avg:.2f}, "
+    print(f"\rEpoch {split} Summary: Train loss: {Loss:.4f}, "
+          f"SegNet Acc: {Global_Avg:.2f}, "
           f"Class Acc: {Class_Avg:.2f}, "
-          f"IoU: {IoU:.2f} \n")
+          f"IoU: {IoU:.2f}")
 
     return Loss, Global_Avg, Class_Avg, IoU
 
@@ -101,7 +101,7 @@ def train(epoch, segnet, train_loader, optimizer, args):
 
     segnet_acc = 100 * (segnet_acc / nb_sample)
 
-    print(f"\rEpoch Train Summary: Train Avg loss: {avg_loss:.4f}, "
-          f"SegNet acc: {segnet_acc:.2f}")
+    print(f"\rEpoch Train Summary: Train loss: {avg_loss:.4f}, "
+          f"Segnet Acc: {segnet_acc:.2f}")
 
     return avg_loss, segnet_acc

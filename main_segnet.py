@@ -61,7 +61,7 @@ def main(args):
             val_loss, val_global_acc, val_class_acc, val_iou = evaluate(epoch, segnet, val_loader, "Val", metric, args)
             
             if args.wandb:
-                wandb.log({'Train Loss': train_loss, 'Train Acc': train_acc, 'Val Loss': val_loss, 'Val Global Acc': val_global_acc, 'Val Class Acc': val_class_acc, 'Val IoU': val_iou}, step = epoch + 1)
+                wandb.log({'Train Loss': train_loss, 'Train Acc': train_acc, 'Val Loss': val_loss, 'Val Acc': val_global_acc, 'Val Class Acc': val_class_acc, 'Val IoU': val_iou}, step = epoch + 1)
 
             if epoch % 5 == 0:               # save Checkpoint
                 model_to_save = segnet.module.state_dict()

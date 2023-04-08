@@ -5,13 +5,19 @@ In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV
 
 [Our paper](https://arxiv.org/abs/2108.01634)
 
-## Improvement from the [original repository](https://github.com/valeoai/obsnet)
+This paper presents ObsNet for OOD segmentation task, which is not only segment trained objects (in distribution - ID) but also recongized unseen object from the training set (out-of-distribution - OOD).
+
+ObsNet consists of Segmentation Network (SegNet) for semantic segmentation and Observer Network (ObsNet) for OOD detection with adversarial attack training. The method framework includes two steps: (i) training SegNet for semantic segmentation tasks, (ii) freeze SegNet and use its weight to init ObsNet, then trained ObsNet for OOD segmentation tasks.
+
+The paper performed experiments on 3 OOD datasets: StreetHazards, CamVid, and BBD Anomaly. Each dataset consists of train/val test with ID objects, and test set with both ID and OOD objects. 
+
+## Improvements from the [original repository](https://github.com/valeoai/obsnet)
 
 - [x] More details instructions for preparing datasets
-- [x] [Segmenter](https://arxiv.org/abs/2105.05633) (ViT-based) as model
-- [x] Training support for Segmentation Network with detailed instructions
-- [x] Better code management for both SegNet and ObsNet training/testing 
-- [x] Logging, tracking, and visualizing experiments with [WandB](https://wandb.ai/) (better than Tensorboard for sure 😉)
+- [x] Include [Segmenter](https://arxiv.org/abs/2105.05633) (ViT-based) as model
+- [x] Training Segmentation Network  with detailed instructions
+- [x] Better code management for both SegNet and ObsNet 
+- [x] Logging, tracking, and visualizing experiments with [WandB](https://wandb.ai/) (better than TensorBoard for sure 😉)
 
 
 ##  Repository Structure
@@ -144,13 +150,13 @@ Unlike the original repository, we provide both SegNet and ObsNet training schem
     + We currently perfrom test on validation set, because the test set includes OOD objects that are inappropriate for evaluation the semantic segmentation tasks.
     + By default, the selected segnet weight is `logs/<log_id>/best.pth`
     + If you want to perform test on any segnet pretrained model, just store the model file on `segnet_file/` and using flag `--segnet_file <model name>`. In this case, `--segnet_file` automatically **ovewrites** the `--log` options. Thus you don't have to set value for `--log`
-+ **Example**: Training StreetHazards on Segmenter for Segnet:
-      ```
++ **Example**: Training StreetHazards on Segmenter for Segnet:  
+    ```
       # training:
         python main_segnet.py --dataset StreetHazards --model segmenter --wandb
       # testing:
         python main_segnet.py --dataset StreetHazards --model segmenter --log segnet_StreetHazards_segmenter_20230408@092021 --test
-      ```
+    ```
 
 ### ObsNet
 
@@ -158,7 +164,7 @@ Unlike the original repository, we provide both SegNet and ObsNet training schem
     ```
       python main_obsnet.py --model <model name> --data <dataset name> --adv <type of adversarial attack> --segnet_file <segnet_file name> --no_pretrained <optional> --wandb <optional>
     ```
-    + `--no_pretrained`: No initialize the weight of the ObsNt with those of the SegNet
+    + `--no_pretrained`: No initialize the weight of the ObsNet with those of the SegNet
     + `--wandb`: log in WandB server
     + The obsnet trained weight model is automatically generated in `logs/<log_id>` with `log_id = obsnet_<dataset_name>_<model_name>_<datetime>`. For example: `obsnet_StreetHazards_segnet_20230408@083545`
     + After training, please move the ObsNet trained model to folder `obsnet_file\`

@@ -48,16 +48,18 @@ The paper performed experiments on 3 OOD datasets: StreetHazards, CamVid, and BB
     |    |      ├── loss.py                         <- focal loss      
     |    |      ├── metrics.py                      <- metrics for evaluation     
     |    |      └── utils.py                        <- useful functions
+    |    |
     |    ├── logs/                                  <- trained logs
     |    ├── obsnet_file/                           <- store pre-trained ObsNet models
     |    ├── segnet_file/                           <- store pre-trained SegNet models
+    |    |
     |    ├── configs.py                             <- Dataset params configs
     |    ├── engine_obsnet.py                       <- Training and evaluation code for obsnet
     |    ├── engine_segnet.py                       <- Training and evaluation code for segnet
     |    ├── main_obsnet.py                         <- Main code for obsnet
     |    ├── main_segnet.py                         <- Main code for segnet
     |    ├── inference.py                           <- perform inference on custom images
-    |    ├── README.md                              <- me :)
+    |    ├── README.md                              <- README :)
 
 ## Usage
     

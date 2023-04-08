@@ -35,6 +35,8 @@ def net_loader(args):
 
     else:
         raise NameError("Model not known")
+    
+    print(f"Load SegNet file: {args.segnet_file}")
 
     if args.model == "segmenter":
         segnet.load_state_dict(torch.load(args.segnet_file)['model'], strict=True)
@@ -44,7 +46,13 @@ def net_loader(args):
     segnet.eval()
 
     if args.test or args.resume:
-        obsnet.load_state_dict(torch.load(os.path.join(args.obsnet_file, "best.pth")))
+        if args.obsnet_file:
+            print(f"Load ObsNet file: {args.obsnet_file}")
+            obsnet.load_state_dict(torch.load(args.obsnet_file))
+        else:
+            obsnet_file = os.path.join(args.log, "best.pth")
+            print(f"Load ObsNet file: {obsnet_file}")
+            obsnet.load_state_dict(torch.load(obsnet_file))
 
     if args.test:
         obsnet.eval()

@@ -27,7 +27,13 @@ def net_loader(args):
 
         
     if args.test or args.resume:
-        segnet.load_state_dict(torch.load(os.path.join(args.segnet_file, "best.pth")))
+        if args.segnet_file:
+            print(f"Load SegNet file: {args.segnet_file}")
+            segnet.load_state_dict(torch.load(args.segnet_file))
+        else:    
+            segnet_file = os.path.join(args.log, "best.pth")
+            print(f"Load SegNet file: {segnet_file}")
+            segnet.load_state_dict(torch.load(segnet_file))
 
     if not args.test:
         segnet = nn.DataParallel(segnet) #, device_ids = [1])

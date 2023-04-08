@@ -131,34 +131,51 @@ Unlike the original repository, we provide both SegNet and ObsNet training schem
 
 ### SegNet
 
-+ Training:
++ **Training** (includes testing in the end):
     ```
     python main_segnet.py --dataset <dataset name> --model <model name> --wandb <this flag is optional>
     ```
-    + The segnet trained weight model is automatically generated in `logs/segnet_<dataset_name>_<model_name>_<datetime>`, for example: `segnet_StreetHazards_segnet_20230408@083545`
-
-+ Testing is not support for this scheme (currently), due to the presence of OOD categories in test set.
-
-+ After training, please move the SegNet trained model, (i.e, `best.pth`) to folder `segnet_file\` for ObsNet training
+    + The segnet trained weight model is automatically generated in `logs/<log_id>` with `log_id = segnet_<dataset_name>_<model_name>_<datetime>`. For example:`segnet_StreetHazards_segnet_20230408@083545`
+    + After training, please move the SegNet trained model, (i.e, `best.pth`) to folder `segnet_file\` for ObsNet training 
++ **Testing** only:
+    ```
+    python main_segnet.py --dataset <dataset name> --model <model name> --logs <log_id> --test
+    ```
+    + We currently perfrom test on validation set, because the test set includes OOD objects that are inappropriate for evaluation the semantic segmentation tasks.
+    + By default, the selected segnet weight is `logs/<log_id>/best.pth`
+    + If you want to perform test on any segnet pretrained model, just store the model file on `segnet_file/` and using flag `--segnet_file <model name>`. In this case, `--segnet_file` automatically **ovewrites** the `--log` options. Thus you don't have to set value for `--log`
++ **Example**: Training StreetHazards on Segmenter for Segnet:
+      ```
+      # training:
+        python main_segnet.py --dataset StreetHazards --model segmenter --wandb
+      # testing:
+        python main_segnet.py --dataset StreetHazards --model segmenter --log segnet_StreetHazards_segmenter_20230408@092021 --test
+      ```
 
 ### ObsNet
 
-+ Training (including testing in the end):
-
++ **Training** (includes testing in the end):
     ```
-      python main.py --model <model name> --data <dataset name> --adv <type of adversarial attack> --segnet_file <segnet_file name> --no_pretrained <optional> --wandb <optional>
+      python main_obsnet.py --model <model name> --data <dataset name> --adv <type of adversarial attack> --segnet_file <segnet_file name> --no_pretrained <optional> --wandb <optional>
     ```
-    + `--no_pretrained`: Initialize the weight of the observer network with those of the segnet
-          model
+    + `--no_pretrained`: No initialize the weight of the ObsNt with those of the SegNet
     + `--wandb`: log in WandB server
-    + The obsnet trained weight model is automatically generated in `logs/obsnet_<dataset_name>_<model_name>_<datetime>`, for example: `obsnet_StreetHazards_segnet_20230408@083545`
+    + The obsnet trained weight model is automatically generated in `logs/<log_id>` with `log_id = obsnet_<dataset_name>_<model_name>_<datetime>`. For example: `obsnet_StreetHazards_segnet_20230408@083545`
     + After training, please move the ObsNet trained model to folder `obsnet_file\`
 
-+ Testing only:
++ **Testing** only:
     ```
-      python main.py --model <model name> --data <dataset name> --adv <type of adversarial attack> --segnet_file <segnet_file name> --obsnet_file <obsnet_file name> --test
+      python main_obsnet.py --model <model name> --data <dataset name> --adv <type of adversarial attack> --segnet_file <segnet_file name> --log <log_id> --test
     ```
-    + Require both `--segnet_file` and `--obsnet_file` to have the model file name. By default, the 2 models is automatically selected in `segnet_file/` and `obsnet_file/`
+    + Require both `--segnet_file <model_name.pth>` and `--log <log_id>` to have value. By default, the two models is automatically selected from `segnet_file/<model_name.pth>` and `logs/<log_id>/best.pth`
+    + If you want to perform test on any obsnet pretrained model, just store the model file on `obsnet_file/` and using flag `--obsnet_file <model name>`. In this case, `--segnet_file` automatically **ovewrites** the `--log` options. Thus you don't have to set value for `--log`
++ **Example**: Training StreetHazards on Segmenter for ObsNet
+    ```
+    # training:
+        python main_obsnet.py --model segmenter --data StreetHazards --adv min_random_patch --segnet_file  Segmenter_StreetHazards.pth --wandb
+    # testing: 
+        python main_obsnet.py --model segmenter --data StreetHazards --adv min_random_patch --segnet_file  Segmenter_StreetHazards.pth --log obsnet_StreetHazards_segnet_20230408@083545 --test 
+    ```
 
 ### Inference 
 

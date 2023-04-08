@@ -69,15 +69,15 @@ def main(args):
 
             if epoch % 5 == 0:               # save Checkpoint
                 model_to_save = obsnet.module.state_dict()
-                torch.save(model_to_save, os.path.join(args.obsnet_file, f"epoch{epoch:03d}.pth"))
+                torch.save(model_to_save, os.path.join(args.log, f"epoch{epoch:03d}.pth"))
             model_to_save = obsnet.module.state_dict()
-            torch.save(model_to_save, os.path.join(args.obsnet_file, f"checkpoint.pth"))
+            torch.save(model_to_save, os.path.join(args.log, f"checkpoint.pth"))
 
             if train_results_obs["auroc"] > best:  # Save Best model
                 print("save best net!!!")
                 best = train_results_obs["auroc"]
                 model_to_save = obsnet.module.state_dict()
-                torch.save(model_to_save, os.path.join(args.obsnet_file, "best.pth"))
+                torch.save(model_to_save, os.path.join(args.log, "best.pth"))
             sched.step()
         
         print("===================================")
@@ -99,9 +99,9 @@ def main(args):
 if __name__ == '__main__':
     ### Argparse ###
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dset_folder",     type=str,      default="",         help="path to dataset")
     parser.add_argument("--segnet_file",     type=str,      default="",         help="path to segnet")
     parser.add_argument("--obsnet_file",     type=str,      default="",         help="path to obsnet")
+    parser.add_argument("--log",             type=str,      default="",         help="obsnet models log")
     parser.add_argument("--model",           type=str,      default="segnet",   help="segnet|deeplabv3plus|road_anomaly|segmenter")
     parser.add_argument("--data",            type=str,      default="",         help="CamVid|StreetHazard|BddAnomaly")
     parser.add_argument("--t",               type=int,      default=50,         help="number of forward pass for ensemble")
@@ -109,16 +109,13 @@ if __name__ == '__main__':
     parser.add_argument("--bsize",           type=int,      default=8,          help="batch size")
     parser.add_argument("--lr",              type=float,    default=0.2,        help="learning rate of obsnet")  
     parser.add_argument("--temp",            type=float,    default=1.2,        help="temperature scaling ratio")
-    parser.add_argument("--noise",           type=float,    default=0.,         help="noise injection in the img data")
     parser.add_argument("--epsilon",         type=float,    default=0.025,      help="epsilon for adversarial attacks")
     parser.add_argument("--gauss_lambda",    type=float,    default=0.002,      help="lambda parameters for gauss params")
     parser.add_argument("--epoch",           type=int,      default=50,         help="number of epoch")
     parser.add_argument("--num_workers",     type=int,      default=4,          help="number of workers")              
-    parser.add_argument("--num_nodes",       type=int,      default=1,          help="number of node")
     parser.add_argument("--adv",             type=str,      default="none",     help="type of adversarial attacks")
     parser.add_argument("--optim",           type=str,      default="SGD",      help="type of optimizer SGD|AdamW")
     parser.add_argument("--test_multi",      type=str,      default="obsnet",   help="test all baseline, split by comma")
-    parser.add_argument("--drop",               action='store_true',            help="activate dropout in segnet")
     parser.add_argument("--wandb",              action='store_true',            help="activate wandb log")
     parser.add_argument("--no_img",             action='store_true',            help="use image for obsnet")
     parser.add_argument("--resume",             action='store_true',            help="restart the training")
@@ -140,11 +137,13 @@ if __name__ == '__main__':
     date_id = "{:%Y%m%d@%H%M%S}".format(datetime.datetime.now())
     args.dset_folder = "Datasets/" + args.data + "/"
     if not args.test:
-        args.obsnet_file = "logs/obsnet_" + args.data +  "_" + args.model + "_" + date_id + "/"
-        os.mkdir(args.obsnet_file)
+        args.log = "logs/obsnet_" + args.data +  "_" + args.model + "_" + date_id + "/"
+        os.mkdir(args.log)
     else:
-        args.obsnet_file = "obsnet_file/" + args.obsnet_file
-    # date_id = "20230401@230445"
+        args.log = "logs/" + args.log
+        if args.obsnet_file:
+            args.obsnet_file = 'obsnet_file/' + args.obsnet_file
+            
     if args.wandb:
         if args.no_pretrained:
             wandb_name = date_id + "-" + args.data + "-" + args.model + "-" + args.adv + "-no_pretrained"

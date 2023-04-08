@@ -44,7 +44,7 @@ def main(args):
     metric = IoU(args.nclass)
 
     if args.test:
-        # evaluate(0, segnet, test_loader, "Test", metric, args)
+        evaluate(0, segnet, val_loader, "Test", metric, args)
         print()
     else:
         best = 0
@@ -65,26 +65,26 @@ def main(args):
 
             if epoch % 5 == 0:               # save Checkpoint
                 model_to_save = segnet.module.state_dict()
-                torch.save(model_to_save, os.path.join(args.segnet_file, f"epoch{epoch:03d}.pth"))
+                torch.save(model_to_save, os.path.join(args.log, f"epoch{epoch:03d}.pth"))
 
             if val_iou > best:  # Save Best model
                 print("save best net!!!")
                 best = val_iou
                 model_to_save = segnet.module.state_dict()
-                torch.save(model_to_save, os.path.join(args.segnet_file, "best.pth"))
+                torch.save(model_to_save, os.path.join(args.log, "best.pth"))
             sched.step()
         
-        # print("===================================")
-        # print("Testing phase: ")
-        # print("===================================")
+        print("===================================")
+        print("Testing phase: ")
+        print("===================================")
         
-        # args.test = True
-        # segnet = net_loader(args)      
-        # metric = IoU(args.nclass)                 
+        args.test = True
+        segnet = net_loader(args)      
+        metric = IoU(args.nclass)                 
         
-        # test_loss, test_global_acc, test_class_acc, test_IoU = evaluate(0, segnet, test_loader, "Test", metric, args)
-        # if args.wandb:
-        #     wandb.log({'Test Loss': test_loss, 'Test Acc': test_acc})
+        test_loss, test_global_acc, test_class_acc, test_IoU = evaluate(0, segnet, val_loader, "Test", metric, args)
+        if args.wandb:
+            wandb.log({'Test Loss': test_loss, 'Test Acc': test_acc})
              
     if args.wandb:
         wandb.finish()
@@ -93,20 +93,16 @@ def main(args):
 if __name__ == '__main__':
     ### Argparse ###
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dset_folder",     type=str,      default="",         help="path to dataset")
     parser.add_argument("--segnet_file",     type=str,      default="",         help="path to segnet")
-    parser.add_argument("--model",           type=str,      default="segnet",   help="segnet|deeplabv3plus|road_anomaly")
+    parser.add_argument("--log",             type=str,      default="",         help="segnet models log")
+    parser.add_argument("--model",           type=str,      default="segnet",   help="segnet|deeplabv3plus|road_anomaly|segmenter")
     parser.add_argument("--data",            type=str,      default="",         help="CamVid|StreetHazard|BddAnomaly")
     parser.add_argument("--seed",            type=int,      default=4040,       help="seed, if -1 no seed is use")
     parser.add_argument("--bsize",           type=int,      default=8,          help="batch size")
     parser.add_argument("--lr",              type=float,    default=0.2,        help="learning rate")  
-    parser.add_argument("--temp",            type=float,    default=1.2,        help="temperature scaling ratio")
     parser.add_argument("--epoch",           type=int,      default=50,         help="number of epoch")
     parser.add_argument("--num_workers",     type=int,      default=4,          help="number of workers")              
-    parser.add_argument("--num_nodes",       type=int,      default=1,          help="number of node")
     parser.add_argument("--optim",           type=str,      default="SGD",      help="type of optimizer SGD|AdamW")
-
-    parser.add_argument("--drop",               action='store_true',            help="activate dropout in segnet")
     parser.add_argument("--wandb",              action='store_true',            help="activate wandb log")
     parser.add_argument("--resume",             action='store_true',            help="restart the training")
     parser.add_argument("--test",               action='store_true',            help="evaluate methods")
@@ -124,8 +120,12 @@ if __name__ == '__main__':
     date_id = "{:%Y%m%d@%H%M%S}".format(datetime.datetime.now())
     args.dset_folder = "Datasets/" + args.data + "/"
     if not args.test:
-        args.segnet_file = "logs/segnet_" + args.data + "_" + args.model + "_" + date_id + "/"
-        os.mkdir(args.segnet_file)
+        args.log = "logs/segnet_" + args.data + "_" + args.model + "_" + date_id + "/"
+        os.mkdir(args.log)
+    else:
+        args.log = "logs/" + args.log
+        if args.segnet_file:
+            args.segnet_file = "segnet_file/" + args.segnet_file
     
     if args.wandb:
         wandb_name = date_id + "-" + args.data + "-" + args.model    

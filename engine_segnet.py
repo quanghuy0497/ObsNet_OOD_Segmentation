@@ -20,7 +20,7 @@ def evaluate(epoch, segnet, loader, split, metric, args):
             bsize, channel, width, height = images.size()
             images = images.to(args.device)
             target = target.to(args.device)
-
+            
             segnet_feat = segnet(images)                         
             
             segnet_pred = transform_output(pred=segnet_feat, bsize=bsize, nclass=args.nclass)
@@ -31,6 +31,7 @@ def evaluate(epoch, segnet, loader, split, metric, args):
             
             pred = segnet_pred.detach().max(1)[1]
             total_correct += pred.eq(target.view_as(pred)).sum()
+            
             total += len(target.view(-1))
             metric.add(segnet_feat.detach(), target.view(-1, width, height))
 
@@ -38,9 +39,9 @@ def evaluate(epoch, segnet, loader, split, metric, args):
                 seg_map = wandb.Image(plot(images, segnet_feat, target, args), caption="Segmentation map")
                 
                 if args.test:
-                    wandb.log({"Test/Segmentation Map": seg_map})
+                    wandb.log({"Test Segmentation Map": seg_map})
                 else:
-                    wandb.log({"Val/Segmentation Map": seg_map}, step = epoch + 1)
+                    wandb.log({"Val Segmentation Map": seg_map}, step = epoch + 1)
 
             print(f"\rEval loss: {loss.cpu().item():.4f}, "
                     f"Progress: {100 * (i / len(loader)):.2f}%", end="")
@@ -49,9 +50,9 @@ def evaluate(epoch, segnet, loader, split, metric, args):
     avg_loss /= len(loader)
     
     Loss =  avg_loss.detach().cpu().item()
-    Global_Avg = round(float(total_correct)/total, 4)
-    Class_Avg = round(metric.value()[2], 4)
-    IoU = metric.value()[1]
+    Global_Avg = round(float(total_correct)/total * 100, 4)
+    Class_Avg = round(metric.value()[2] * 100, 4)
+    IoU = metric.value()[1] * 100
 
     print(f"\rEpoch {split} Summary: Avg loss: {Loss:.4f}, "
           f"Global Acc: {Global_Avg:.2f}, "

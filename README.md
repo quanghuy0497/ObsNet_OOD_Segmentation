@@ -3,11 +3,11 @@ Victor Besnier, Andrei Bursuc, David Picard & Alexandre Briot
 
 In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) 2021
 
-[Our paper](https://arxiv.org/abs/2108.01634)
+[Paper](https://arxiv.org/abs/2108.01634)
 
-This paper presents ObsNet for OOD segmentation task, which is not only segment trained objects (in distribution - ID) but also recongized unseen object from the training set (out-of-distribution - OOD).
+This paper presents ObsNet for OOD segmentation task, which is not only able to segment trained objects (in distribution - ID) but also recognize unseen object from the training set (out-of-distribution - OOD).
 
-ObsNet consists of Segmentation Network (SegNet) for semantic segmentation and Observer Network (ObsNet) for OOD detection with adversarial attack training. The method framework includes two steps: (i) training SegNet for semantic segmentation tasks, (ii) freeze SegNet and use its weight to init ObsNet, then trained ObsNet for OOD segmentation tasks.
+ObsNet consists of Segmentation Network (SegNet) for semantic segmentation and Observer Network (ObsNet) for OOD detection with adversarial attack training. The method framework includes two steps: (i) training SegNet for semantic segmentation tasks, (ii) freezing SegNet and using its weight to initialize ObsNet, then training ObsNet for OOD detection tasks with adversarial learning.
 
 The paper performed experiments on 3 OOD datasets: StreetHazards, CamVid, and BBD Anomaly. Each dataset consists of train/val test with ID objects, and test set with both ID and OOD objects. 
 
@@ -18,7 +18,6 @@ The paper performed experiments on 3 OOD datasets: StreetHazards, CamVid, and BB
 - [x] Training Segmentation Network  with detailed instructions
 - [x] Better code management for both SegNet and ObsNet 
 - [x] Logging, tracking, and visualizing experiments with [WandB](https://wandb.ai/) (better than TensorBoard for sure 😉)
-
 
 ##  Repository Structure
     ├ Obsnet/
@@ -154,9 +153,9 @@ Unlike the original repository, we provide both SegNet and ObsNet training schem
     + If you want to perform test on any segnet pretrained model, just store the model file on `segnet_file/` and using flag `--segnet_file <model name>`. In this case, `--segnet_file` automatically **ovewrites** the `--log` options. Thus you don't have to set value for `--log`
 + **Example**: Training StreetHazards on Segmenter for Segnet:  
     ```
-      # training:
+    # training:
         python main_segnet.py --dataset StreetHazards --model segmenter --wandb
-      # testing:
+    # testing:
         python main_segnet.py --dataset StreetHazards --model segmenter --log segnet_StreetHazards_segmenter_20230408@092021 --test
     ```
 

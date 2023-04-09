@@ -36,6 +36,6 @@ def net_loader(args):
             segnet.load_state_dict(torch.load(segnet_file))
 
     if not args.test:
-        segnet = nn.DataParallel(segnet) #, device_ids = [1])
+        segnet = nn.DataParallel(segnet, device_ids = [0])
         
     return segnet

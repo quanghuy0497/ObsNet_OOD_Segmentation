@@ -17,6 +17,7 @@ The paper performed experiments on 3 OOD datasets: StreetHazards, CamVid, and BB
 - [x] Include [Segmenter](https://arxiv.org/abs/2105.05633) (ViT-based) as model
 - [x] Training Segmentation Network  with detailed instructions
 - [x] Better code management for both SegNet and ObsNet 
+- [x] `logs/results.txt` to record experiments (for full training/testing scheme only)
 - [x] Logging, tracking, and visualizing experiments with [WandB](https://wandb.ai/) (better than TensorBoard for sure 😉)
 
 ##  Repository Structure
@@ -153,10 +154,11 @@ Unlike the original repository, we provide both SegNet and ObsNet training schem
     + If you want to perform test on any segnet pretrained model, just store the model file on `segnet_file/` and using flag `--segnet_file <model name>`. In this case, `--segnet_file` automatically **ovewrites** the `--log` options. Thus you don't have to set value for `--log`
 + **Example**: Training StreetHazards on Segmenter for Segnet:  
     ```
-    # training:
+    # training + testing:
         python main_segnet.py --dataset StreetHazards --model segmenter --wandb
-    # testing:
+    # testing only:
         python main_segnet.py --dataset StreetHazards --model segmenter --log segnet_StreetHazards_segmenter_20230408@092021 --test
+        python main_segnet.py --dataset StreetHazards --model segmenter --segnet_file Segmenter_StreetHazards.pth --test
     ```
 
 ### ObsNet
@@ -178,10 +180,11 @@ Unlike the original repository, we provide both SegNet and ObsNet training schem
     + If you want to perform test on any obsnet pretrained model, just store the model file on `obsnet_file/` and using flag `--obsnet_file <model name>`. In this case, `--segnet_file` automatically **ovewrites** the `--log` options. Thus you don't have to set value for `--log`
 + **Example**: Training StreetHazards on Segmenter for ObsNet
     ```
-    # training:
+    # training + testing:
         python main_obsnet.py --model segmenter --data StreetHazards --adv min_random_patch --segnet_file  Segmenter_StreetHazards.pth --wandb
-    # testing: 
+    # testing only: 
         python main_obsnet.py --model segmenter --data StreetHazards --adv min_random_patch --segnet_file  Segmenter_StreetHazards.pth --log obsnet_StreetHazards_segnet_20230408@083545 --test 
+        python main_obsnet.py --model segmenter --data StreetHazards --adv min_random_patch --segnet_file  Segmenter_StreetHazards.pth --obsnet_file Segmenter_StreetHazards.pth --test 
     ```
 
 ### Inference 

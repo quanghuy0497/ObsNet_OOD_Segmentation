@@ -84,7 +84,15 @@ def main(args):
         
         test_loss, test_global_acc, test_class_acc, test_IoU = evaluate(0, segnet, val_loader, "Test", metric, args)
         if args.wandb:
-            wandb.log({'Test Loss': test_loss, 'Test Acc': test_acc})
+            wandb.log({'Test Loss': test_loss, 'Test Acc': test_global_acc, 'Test Class Acc': test_class_acc, 'Test IoU': test_IoU})
+        
+        
+        with open('logs/results.txt', 'a') as f:
+            exp_setting = "SegNet"+ "--" + args.data + "--" + args.model    
+            acc_str = 'Test Acc = %4.2f%% ; Test Class Acc %4.2f%% ; Test IoU %4.2f%%' % (test_global_acc, test_class_acc, test_IoU)
+            f.write('Time: %s   %s\n' % (args.date_id, exp_setting))
+            f.write('%s %s \n' %("".ljust(23), acc_str))
+            print("Update experiment record on logs/results.txt")
              
     if args.wandb:
         wandb.finish()
@@ -117,10 +125,10 @@ if __name__ == '__main__':
     args.criterion = nn.CrossEntropyLoss()
 
     #### Preprocessing ####
-    date_id = "{:%Y%m%d@%H%M%S}".format(datetime.datetime.now())
+    args.date_id = "{:%Y%m%d@%H%M%S}".format(datetime.datetime.now())
     args.dset_folder = "Datasets/" + args.data + "/"
     if not args.test:
-        args.log = "logs/segnet_" + args.data + "_" + args.model + "_" + date_id + "/"
+        args.log = "logs/segnet_" + args.data + "_" + args.model + "_" + args.date_id + "/"
         os.mkdir(args.log)
     else:
         args.log = "logs/" + args.log
@@ -128,8 +136,8 @@ if __name__ == '__main__':
             args.segnet_file = "segnet_file/" + args.segnet_file
     
     if args.wandb:
-        wandb_name = date_id + "-" + args.data + "-" + args.model    
-        wandb.init(project="Observer Network - SegNet", name = wandb_name, config = args, id = date_id)
+        wandb_name = args.date_id + "-" + args.data + "-" + args.model    
+        wandb.init(project="Observer Network - SegNet", name = wandb_name, config = args, id = args.date_id)
             
     #### Print Args ####
     pp = pprint.PrettyPrinter(indent=4)

@@ -58,7 +58,7 @@ def net_loader(args):
         obsnet.eval()
 
     if not args.test:
-        segnet = nn.DataParallel(segnet) #, device_ids = [1])
-        obsnet = nn.DataParallel(obsnet) #, device_ids = [1])
+        segnet = nn.DataParallel(segnet, device_ids = [0])
+        obsnet = nn.DataParallel(obsnet, device_ids = [0])
 
     return obsnet, segnet

@@ -6,6 +6,7 @@ obsnet_file/*
 segnet_file/*
 
 logs/*
+!logs/results.txt
 wandb/
 tmp_code/
 

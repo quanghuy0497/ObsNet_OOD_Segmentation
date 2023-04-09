@@ -91,6 +91,21 @@ def main(args):
         test_obsnet_acc, test_segnet_acc, test_loss, test_results_obs = evaluate(0, obsnet, segnet, test_loader, "Test", args)
         if args.wandb:
             wandb.log({'Test/Loss': test_loss, 'Test/ObsNet Acc': test_obsnet_acc, 'Test/SegNet Acc': test_segnet_acc, 'Test/AuROC': test_results_obs["auroc"], 'Test/FPR@95': test_results_obs["fpr_at_95tpr"], 'Test/AuPR': test_results_obs["aupr"],'Test/ACE': test_results_obs["ace"]})
+            
+        with open('logs/results.txt', 'a') as f:
+                 
+            if args.no_pretrained:
+                exp_setting = "ObsNet"+ "--" + args.data + "--" + args.model + "--" + args.adv + "--no_pretrained"
+            else:
+                exp_setting = "ObsNet"+ "--" + args.data + "--" + args.model + "--" + args.adv + "--" + args.segnet_file
+                
+            acc_str1= 'Test ObsNet Acc = %4.2f%% ; Test SegNet Acc %4.2f%%' % (test_obsnet_acc, test_segnet_acc)
+            acc_str2= 'Test AuROC %4.2f%% ; Test FPR@95 %4.2f%% ; Test AuPR %4.2f%% ; Test ACE %4.4f%%' % (test_results_obs["auroc"], test_results_obs["fpr_at_95tpr"], test_results_obs["aupr"], test_results_obs["ace"])
+            
+            f.write('Time: %s   %s\n' % (date_id, exp_setting))
+            f.write('%s %s \n' %("".ljust(23), acc_str1))
+            f.write('%s %s \n' %("".ljust(23), acc_str2))
+            print("Update experiment record on logs/results.txt")
              
     if args.wandb:
         wandb.finish()
@@ -134,10 +149,10 @@ if __name__ == '__main__':
     args.test_multi = args.test_multi.split(",")
 
     #### Preprocessing ####
-    date_id = "{:%Y%m%d@%H%M%S}".format(datetime.datetime.now())
+    args.date_id = "{:%Y%m%d@%H%M%S}".format(datetime.datetime.now())
     args.dset_folder = "Datasets/" + args.data + "/"
     if not args.test:
-        args.log = "logs/obsnet_" + args.data +  "_" + args.model + "_" + date_id + "/"
+        args.log = "logs/obsnet_" + args.data +  "_" + args.model + "_" + args.date_id + "/"
         os.mkdir(args.log)
     else:
         args.log = "logs/" + args.log
@@ -146,11 +161,11 @@ if __name__ == '__main__':
             
     if args.wandb:
         if args.no_pretrained:
-            wandb_name = date_id + "-" + args.data + "-" + args.model + "-" + args.adv + "-no_pretrained"
+            wandb_name = args.date_id + "-" + args.data + "-" + args.model + "-" + args.adv + "-no_pretrained"
         else:
-            wandb_name = date_id + "-" + args.data + "-" + args.model  + "-" + args.adv + "-" + args.segnet_file
+            wandb_name = args.date_id + "-" + args.data + "-" + args.model  + "-" + args.adv + "-" + args.segnet_file
             
-        wandb.init(project="Observer Network - ObsNet", name = wandb_name, config = args, id = date_id)
+        wandb.init(project="Observer Network - ObsNet", name = wandb_name, config = args, id = args.date_id)
         
     args.segnet_file = 'segnet_file/' +  args.segnet_file
     

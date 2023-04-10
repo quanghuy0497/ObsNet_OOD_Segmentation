@@ -197,10 +197,9 @@ Example:
 
 ## Pretrained ObsNet Models
 
-Pretrained model for ObsNet are available in this [google drive](https://drive.google.com/drive/folders/11S9oK-Bk9PoP2728ldrROQKAa8Q3iUxx?usp=sharing). Please save on `obsnet_file/`
+Pretrained model for ObsNet (from the original repo) are available in this [google drive](https://drive.google.com/drive/folders/11S9oK-Bk9PoP2728ldrROQKAa8Q3iUxx?usp=sharing). Please save on `obsnet_file/`
 
 ## Citation
-If you find this repository usefull, please consider citing our [paper](https://arxiv.org/abs/2108.01634):
 
     @incollection{besnier2021trigger,
        title = {Triggering Failures: Out-Of-Distribution detection by learning from local adversarial attacks in Semantic Segmentation},

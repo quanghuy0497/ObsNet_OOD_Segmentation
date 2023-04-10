@@ -89,7 +89,7 @@ def main(args):
         
         with open('logs/results.txt', 'a') as f:
             exp_setting = "SegNet"+ "--" + args.data + "--" + args.model    
-            acc_str = 'Test Acc = %4.2f%% ; Test Class Acc %4.2f%% ; Test IoU %4.2f%%' % (test_global_acc, test_class_acc, test_IoU)
+            acc_str = 'SegNet Acc: %4.2f%% | Class Acc: %4.2f%% | IoU: %4.2f%%' % (test_global_acc, test_class_acc, test_IoU)
             f.write('Time: %s   %s\n' % (args.date_id, exp_setting))
             f.write('%s %s \n' %("".ljust(23), acc_str))
             print("Update experiment record on logs/results.txt")

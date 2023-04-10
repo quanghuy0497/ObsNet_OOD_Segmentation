@@ -99,8 +99,8 @@ def main(args):
             else:
                 exp_setting = "ObsNet"+ "--" + args.data + "--" + args.model + "--" + args.adv + "--" + args.segnet_file
                 
-            acc_str1= 'Test ObsNet Acc = %4.2f%% ; Test SegNet Acc %4.2f%%' % (test_obsnet_acc, test_segnet_acc)
-            acc_str2= 'Test AuROC %4.2f%% ; Test FPR@95 %4.2f%% ; Test AuPR %4.2f%% ; Test ACE %4.4f%%' % (test_results_obs["auroc"], test_results_obs["fpr_at_95tpr"], test_results_obs["aupr"], test_results_obs["ace"])
+            acc_str1= 'ObsNet Acc: %4.2f%% | SegNet Acc: %4.2f%%' % (test_obsnet_acc, test_segnet_acc)
+            acc_str2= 'AuROC: %4.2f%% | FPR@95: %4.2f%% | AuPR: %4.2f%% | ACE: %4.3f' % (test_results_obs["auroc"], test_results_obs["fpr_at_95tpr"], test_results_obs["aupr"], test_results_obs["ace"])
             
             f.write('Time: %s   %s\n' % (date_id, exp_setting))
             f.write('%s %s \n' %("".ljust(23), acc_str1))

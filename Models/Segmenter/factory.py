@@ -18,7 +18,24 @@ from .segmenter import Segmenter
 
 
 @register_model
-
+def vit_base_patch8_384(pretrained=False, **kwargs):
+    """ViT-Base model (ViT-B/16) from original paper (https://arxiv.org/abs/2010.11929).
+    ImageNet-1k weights fine-tuned from in21k @ 384x384, source https://github.com/google-research/vision_transformer.
+    """
+    model_kwargs = dict(patch_size=8, embed_dim=768, depth=12, num_heads=12, **kwargs)
+    model = _create_vision_transformer(
+        "vit_base_patch8_384",
+        pretrained=pretrained,
+        default_cfg=dict(
+            url="",
+            input_size=(3, 384, 384),
+            mean=(0.5, 0.5, 0.5),
+            std=(0.5, 0.5, 0.5),
+            num_classes=1000,
+        ),
+        **model_kwargs,
+    )
+    return model
 
 def create_vit(model_cfg):
     model_cfg = model_cfg.copy()
@@ -42,7 +59,12 @@ def create_vit(model_cfg):
     default_cfg["input_size"] = (3, model_cfg["image_size"][0], model_cfg["image_size"][1])
     
     model = VisionTransformer(**model_cfg)
-    if "deit" in backbone:
+    if backbone == "vit_base_patch8_384":
+        path = os.path.expandvars("$TORCH_HOME/hub/checkpoints/vit_base_patch8_384.pth")
+        state_dict = torch.load(path, map_location="cpu")
+        filtered_dict = checkpoint_filter_fn(state_dict, model)
+        model.load_state_dict(filtered_dict, strict=True)
+    elif "deit" in backbone:
         load_pretrained(model, default_cfg, filter_fn=checkpoint_filter_fn)
     else:
         load_custom_pretrained(model, default_cfg)

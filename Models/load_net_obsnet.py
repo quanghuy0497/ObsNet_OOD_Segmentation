@@ -38,10 +38,10 @@ def net_loader(args):
     
     print(f"Load SegNet file: {args.segnet_file}")
 
-    if args.model == "segmenter":
-        segnet.load_state_dict(torch.load(args.segnet_file)['model'], strict=True)
-    else:
-        segnet.load_state_dict(torch.load(args.segnet_file))
+    # if args.model == "segmenter":    # => only with model trained by Segmenter original repo
+    #     segnet.load_state_dict(torch.load(args.segnet_file)['model'], strict=True)
+    # else:
+    segnet.load_state_dict(torch.load(args.segnet_file))
         
     segnet.eval()
 

@@ -93,16 +93,15 @@ def main(args):
             wandb.log({'Test/Loss': test_loss, 'Test/ObsNet Acc': test_obsnet_acc, 'Test/SegNet Acc': test_segnet_acc, 'Test/AuROC': test_results_obs["auroc"], 'Test/FPR@95': test_results_obs["fpr_at_95tpr"], 'Test/AuPR': test_results_obs["aupr"],'Test/ACE': test_results_obs["ace"]})
             
         with open('logs/results.txt', 'a') as f:
-                 
+            
+            exp_setting = "ObsNet"+ "--" + args.segnet_file[:-4] + "--" + args.adv
             if args.no_pretrained:
-                exp_setting = "ObsNet"+ "--" + args.data + "--" + args.model + "--" + args.adv + "--no_pretrained"
-            else:
-                exp_setting = "ObsNet"+ "--" + args.data + "--" + args.model + "--" + args.adv + "--" + args.segnet_file
+                exp_setting += "--no_pretrained"                
                 
             acc_str1= 'ObsNet Acc: %4.2f%% | SegNet Acc: %4.2f%%' % (test_obsnet_acc, test_segnet_acc)
             acc_str2= 'AuROC: %4.2f%% | FPR@95: %4.2f%% | AuPR: %4.2f%% | ACE: %4.3f' % (test_results_obs["auroc"], test_results_obs["fpr_at_95tpr"], test_results_obs["aupr"], test_results_obs["ace"])
             
-            f.write('Time: %s   %s\n' % (date_id, exp_setting))
+            f.write('Time: %s   %s\n' % (args.date_id, exp_setting))
             f.write('%s %s \n' %("".ljust(23), acc_str1))
             f.write('%s %s \n' %("".ljust(23), acc_str2))
             print("Update experiment record on logs/results.txt")

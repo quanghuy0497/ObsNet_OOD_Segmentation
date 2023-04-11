@@ -4,3 +4,6 @@ Time: 20230409@204701   SegNet--StreetHazards--segmenter
                         SegNet Acc: 89.61% | Class Acc: 53.55% | IoU: 48.51% 
 Time: 20230410@080612   SegNet--StreetHazards--deeplabv3plus
                         SegNet Acc: 92.39% | Class Acc: 67.44% | IoU: 63.50% 
+Time: 20230410@173621   ObsNet--SegNet_StreetHazards--max_random_patch
+                        SegNet Acc: 90.90% | ObsNet Acc: 91.45
+                        AuROC: 90.72 | FPR@95: 49.37 | AuPR: 98.93 | ACE: 0.1612

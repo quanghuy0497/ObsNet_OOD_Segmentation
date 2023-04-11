@@ -122,7 +122,7 @@ def evaluate(epoch, obsnet, segnet, loader, split, args):
                         seg_map = wandb.Image(plot(images, segnet_feat[-1], target.view(bsize, -1), args=args), caption='Segmentation Map')
                         ood_map = wandb.Image(uncertainty_map, caption="Uncertainty map")
                         if args.test:
-                            wandb.log({"Test/Segmentation Map": seg_map, split + "Test/Uncertainty Map": ood_map})
+                            wandb.log({"Test/Segmentation Map": seg_map, "Test/Uncertainty Map": ood_map})
                         else:
                             wandb.log({"Val/Segmentation Map": seg_map, "Val/Uncertainty Map": ood_map}, step = epoch + 1)
 

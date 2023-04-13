@@ -94,7 +94,7 @@ def main(args):
             
         with open('logs/results.txt', 'a') as f:
             
-            exp_setting = "ObsNet"+ "--" + args.segnet_file[:-4] + "--" + args.adv
+            exp_setting = "ObsNet"+ "--" + args.data + "--" + args.model + "--" + args.adv
             if args.no_pretrained:
                 exp_setting += "--no_pretrained"                
                 

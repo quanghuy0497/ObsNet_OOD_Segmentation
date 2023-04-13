@@ -30,6 +30,7 @@ def evaluate(epoch, obsnet, segnet, loader, split, args):
     segnet.eval()
     avg_loss, nb_sample, obsnet_acc, segnet_acc = 0, 0, 0., 0.
     r = random.randint(0, len(loader) - 1)
+    count = 0
     for i, (images, target) in enumerate(loader):
         bsize, channel, width, height = images.size()
         nb_sample += bsize * width * height
@@ -105,26 +106,41 @@ def evaluate(epoch, obsnet, segnet, loader, split, args):
                 print(f"\rEval loss: {loss.cpu().item():.4f}, "
                       f"Progress: {100 * (i / len(loader)):.2f}%",
                       end="")
-                if i == r:                                                                  # Visualization
-                    sm = 1 - torch.softmax(segnet_feat[-1], 1).max(1)[0][0]                 # MCP visualization
-                    sm_uncertainty = draw(sm, args).cpu()
+                if args.test:
+                    if i % 20 == 0 and args.wandb:      # save several images simultaneously
+                        sm = 1 - torch.softmax(segnet_feat[-1], 1).max(1)[0][0]     
+                        sm_uncertainty = draw(sm, args).cpu()
 
-                    obs_pred = obs_pred.view(bsize, -1)                                     # ObsNet visualization
-                    obsnet_uncertainty = draw(torch.sigmoid(obs_pred[0]), args).cpu()
+                        obs_pred = obs_pred.view(bsize, -1)     # ObsNet visualization
+                        obsnet_uncertainty = draw(torch.sigmoid(obs_pred[0]), args).cpu()
 
-                    obs_label = supervision.view(bsize, -1)                                 # GT visualization
-                    label = draw(obs_label[0], args).cpu()
+                        obs_label = supervision.view(bsize, -1) # GT visualization
+                        label = draw(obs_label[0], args).cpu()
 
-                    uncertainty_map = torch.cat((obsnet_uncertainty, sm_uncertainty, label), dim=0)
-                    uncertainty_map = make_grid(uncertainty_map, normalize=False)
+                        uncertainty_map = torch.cat((obsnet_uncertainty, sm_uncertainty, label), dim=0)
+                        uncertainty_map = make_grid(uncertainty_map, normalize=False)
 
-                    if args.wandb:
                         seg_map = wandb.Image(plot(images, segnet_feat[-1], target.view(bsize, -1), args=args), caption='Segmentation Map')
                         ood_map = wandb.Image(uncertainty_map, caption="Uncertainty map")
-                        if args.test:
-                            wandb.log({"Test/Segmentation Map": seg_map, "Test/Uncertainty Map": ood_map})
-                        else:
-                            wandb.log({"Val/Segmentation Map": seg_map, "Val/Uncertainty Map": ood_map}, step = epoch + 1)
+                        count += 1
+                        wandb.log({"Test/Segmentation Map": seg_map, "Test/Uncertainty Map": ood_map}, step = count)
+                else:
+                    if i == r and args.wandb:             # save 1 image randomly          
+                        sm = 1 - torch.softmax(segnet_feat[-1], 1).max(1)[0][0]         
+                        sm_uncertainty = draw(sm, args).cpu()
+
+                        obs_pred = obs_pred.view(bsize, -1)     # ObsNet visualization
+                        obsnet_uncertainty = draw(torch.sigmoid(obs_pred[0]), args).cpu()
+
+                        obs_label = supervision.view(bsize, -1) # GT visualization
+                        label = draw(obs_label[0], args).cpu()
+
+                        uncertainty_map = torch.cat((obsnet_uncertainty, sm_uncertainty, label), dim=0)
+                        uncertainty_map = make_grid(uncertainty_map, normalize=False)
+
+                        seg_map = wandb.Image(plot(images, segnet_feat[-1], target.view(bsize, -1), args=args), caption='Segmentation Map')
+                        ood_map = wandb.Image(uncertainty_map, caption="Uncertainty map")
+                        wandb.log({"Val/Segmentation Map": seg_map, "Val/Uncertainty Map": ood_map}, step = epoch + 1)
 
         if "odin" in args.test_multi:                     # output of ODIN
             odin = odin_estimation(segnet, images, bsize, args)

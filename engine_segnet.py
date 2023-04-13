@@ -14,6 +14,7 @@ def evaluate(epoch, segnet, loader, split, metric, args):
     segnet.eval()
     total_correct, total, avg_loss = 0, 0, 0.
     metric.reset()
+    count = 0
     r = random.randint(0, len(loader) - 1)
     with torch.no_grad():
         for i, (images, target) in enumerate(loader):
@@ -35,14 +36,16 @@ def evaluate(epoch, segnet, loader, split, metric, args):
             total += len(target.view(-1))
             metric.add(segnet_feat.detach(), target.view(-1, width, height))
 
-            if i == r and args.wandb:
-                seg_map = wandb.Image(plot(images, segnet_feat, target, args), caption="Segmentation map")
-                
-                if args.test:
-                    wandb.log({"Test Segmentation Map": seg_map})
-                else:
+            if args.test:
+                if (i %20 == 0) and (args.wandb):
+                    count += 1
+                    seg_map = wandb.Image(plot(images, segnet_feat, target, args), caption="Segmentation map")
+                    wandb.log({"Test Segmentation Map": seg_map}, step = count)
+            else:
+                if (i == r) and (args.wandb):
+                    seg_map = wandb.Image(plot(images, segnet_feat, target, args), caption="Segmentation map")
                     wandb.log({"Val Segmentation Map": seg_map}, step = epoch + 1)
-
+            
             print(f"\rEval loss: {loss.cpu().item():.4f}, "
                     f"Progress: {100 * (i / len(loader)):.2f}%", end="")
              
